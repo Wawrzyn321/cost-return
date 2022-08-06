@@ -10,6 +10,9 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
+      <div>
+        <button class="btn btn-primary">Hello daisyUI</button>
+      </div>
       <input
         type="text"
         value={first()}
