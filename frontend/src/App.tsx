@@ -6,7 +6,7 @@ const App: Component = () => {
   const [first, setFirst] = createSignal("JSON");
   const [last, setLast] = createSignal("Bourne");
 
-  createEffect(() => console.log(`${first()} ${last()}`));
+  createEffect(() => console.log(`${first()} ${last()}!`));
 
   return (
     <div class={styles.App}>
