@@ -1,0 +1,14 @@
+[Unit]
+Description=Cost Return Backend Service
+After=network.target
+
+[Service]
+WorkingDirectory=/var/svc/cost-return-backend
+ExecStart=python3 server.py
+Restart=on-failure
+User=ubuntu
+
+Environment=ENV=production REMOTE_ADDRESS='http://127.0.0.1:8888' 
+
+[Install]
+WantedBy=multi-user.target
