@@ -23,7 +23,7 @@ const App: Component = () => {
 
   createEffect(async () => {
     if (isAuthenticated()) {
-      console.log("get token");
+      console.log("get token...");
       setToken(await getToken());
     }
   });
