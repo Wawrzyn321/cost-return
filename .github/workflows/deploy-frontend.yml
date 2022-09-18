@@ -4,10 +4,12 @@ on:
     branches: [ "master" ]
     paths:
       - frontend/**
+      - .github/workflows/deploy-frontend.yml
   pull_request:
     branches: [ "master" ]
     paths:
       - frontend/**
+      - .github/workflows/deploy-frontend.yml
 
   workflow_dispatch:
 jobs:
