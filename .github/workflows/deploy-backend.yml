@@ -4,10 +4,12 @@ on:
     branches: ["master"]
     paths:
       - backend/**
+      - .github/workflows/deploy-backend.yml
   pull_request:
     branches: ["master"]
     paths:
       - backend/**
+      - .github/workflows/deploy-backend.yml
 
   workflow_dispatch:
 jobs:
@@ -39,3 +41,5 @@ jobs:
           script: |
             cd "/var/svc/cost-return-backend"
             pip3 install -r requirements.txt
+            sudo systemctl daemon-reload
+            sudo systemctl restart cost-return.service
