@@ -1,117 +1,98 @@
-import socket as socketLib
-import ssl
+import flask
+from flask_cors import CORS
+from pocketbase import PocketBase
 import requests
 import os
-from urllib import parse
+from werkzeug.routing import Rule
+import jwt
 
-# try to import C parser then fallback in pure python parser.
-try:
-    from http_parser.parser import HttpParser
-except ImportError:
-    from http_parser.pyparser import HttpParser
-import json
-
+ALLOWED_PROFILES = ['google-oauth2|114938617275240442581']
 
 PORT = int(os.getenv('PORT') or '60055')
-ADDRESS = os.getenv('ADDRESS') or '0.0.0.0'
 ENV = (os.getenv('ENV') or 'DEV').upper()
 REMOTE_ADDRESS = os.environ['REMOTE_ADDRESS']
+EMAIL = os.environ['EMAIL']
+PASSWORD = os.environ['PASSWORD']
 
-print('Starting the', ENV, ' server on ', ADDRESS,':',PORT)
+def validate_token(token):
+    print(token)
+    try:
+        alg = jwt.get_unverified_header(token)['alg']
 
-def handleRequest(socket):
-    while True:
-        client_connection, client_address = socket.accept()
+        DOMAIN = 'https://dev-cbdrgzv1.us.auth0.com'
+        JWKS_URL = DOMAIN + '/.well-known/jwks.json'
+        ISSUER = DOMAIN + '/'
+        AUDIENCE = "cost-return-api"
 
-        # # Get the client request
-        # request = client_connection.recv(2048).decode()
-        # splitLines = [line for line in request.split('\r\n')]
-        # [protocolHeader, *headers, _, body] = splitLines
-        # print('PROTOCOL:', protocolHeader)
-        # method = protocolHeader[:protocolHeader.index(' ')]
-        # print('METHOD', method)
-        # hasBody = bool(body)
-        # print('HEADERS', headers)
-        # print('HAS BODY', hasBody)
-        # if (hasBody):
-        #     print('BODY', body)
+        jwks_client = jwt.PyJWKClient(JWKS_URL)
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
 
-        body = []
-        p = HttpParser()
-        while True:
-            data = client_connection.recv(1024)
-            if not data:
-                break
+        profile = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=[alg],
+            issuer=ISSUER,
+            audience=AUDIENCE
+            )
 
-            recved = len(data)
-            assert p.execute(data, recved) == recved
+        if not profile.sub in ALLOWED_PROFILES:
+            return (false, 403)
+        return (True, None)
+    except jwt.DecodeError as e:
+        print('jwt.DecodeError', e)
+        return (False, 400)
+    except jwt.InvalidTokenError as e:
+        print('jwt.InvalidTokenError', e)
+        return (False, 403)
+    except Exception as e:
+        print(e)
+        return (False, 401)
 
-            if p.is_partial_body():
-                body.append(str(p.recv_body()))
+def make_headers(flaskheaders):
+        client = PocketBase(REMOTE_ADDRESS)
+        admin_data = client.admins.auth_via_email(EMAIL, PASSWORD)
 
-            if p.is_message_complete():
-                break
+        headers = {}
 
-        # if body:
-        #     body = ''.join(body)
-        #     body = body[2:len(body)-1]
-        #     try:
-        #         body = json.loads(body)
-        #         print('BODY', body)
-        #     except Exception as e:
-        #         print(e)
-        #         print(body)
-        # print('HEADERS', p.get_headers())
+        for k, v in flaskheaders:
+            headers[k] = v
+        headers['Authorization'] = 'Admin ' + admin_data.token
 
-        # print('VERSION', p.get_version())
-        # print('STATUS', p.get_status_code())
-        # print('URL', p.get_url())
-        # print('PATH', p.get_path())
-        # print('QS', p.get_query_string())
+        return headers
 
-        # Send HTTP response
+app = flask.Flask(__name__)
+app.url_map.add(Rule('/', endpoint='index'))
+app.url_map.add(Rule('/<path:path>', endpoint='index'))
+CORS(app)
 
-        params = parse.parse_qs(parse.urlsplit(p.get_url()).query)
-        result = requests.request(p.get_method(), REMOTE_ADDRESS + p.get_path(), params=params, data=data, headers=p.get_headers())
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
 
-        # print('body len', len(body))
-    
-        print(REMOTE_ADDRESS + p.get_path())
-        response = ['HTTP/1.0 {} {}\r\n'.format(result.status_code, result.reason)]
+    if flask.request.method == 'OPTIONS':
+        return '', 200
 
-        for key, value in result.headers.items():
-            if key == 'Content-Length':
-                print('cnt', value)
-            response.append('{}: {}\r\n'.format(key, value))
+    token = flask.request.headers.get('Authorization')
+    token_valid, error_status = validate_token(token)
+    if not token_valid:
+        return '', error_status
 
-        # print(response)
-
-
-        if (body):
-            response.append('\r\n')
-            response.append(json.dumps(body))
-        else:
-            response.append('\r\n\r\n')
-            
-
-        # print('TOTAL', len("".join(response)), len("".join(response).encode()))
-        response = "".join(response).encode()
-        client_connection.sendall(response)
-
-        client_connection.close()
+    try:
+        result = requests.request(flask.request.method,
+            REMOTE_ADDRESS +"/"+ path,
+            data=flask.request.get_data(),
+            headers=make_headers(flask.request.headers))
+        return result.content, result.status_code
+    except Exception as e:
+        print(e)
+        return 'BRZYDKO', 400
 
 
-context = None
-if ENV == 'PROD':
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('/etc/letsencrypt/live/oto-jest-wawrzyn.pl/fullchain.pem', '/etc/letsencrypt/live/oto-jest-wawrzyn.pl/privkey.pem')
+print('Starting the', ENV, ' server on ', PORT)
 
-with socketLib.socket(socketLib.AF_INET, socketLib.SOCK_STREAM, 0) as socket:
-    socket.bind((ADDRESS, PORT))
-    socket.listen(5)
-
-    if ENV == 'PROD':
-        with context.wrap_socket(socket, server_side=True) as secure_socket:
-            handleRequest(secure_socket)
-    else:
-        handleRequest(socket)
+if ENV == 'PRODUCTION':
+    print('PROD')
+    from waitress import serve
+    serve(app, port=PORT)
+else:
+    app.run(port=PORT)

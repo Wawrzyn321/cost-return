@@ -28,6 +28,19 @@ const App: Component = () => {
     }
   });
 
+  const makeCall = async () => {
+    console.log(token);
+    console.log(token());
+    try {
+      const response = await fetch("http://127.0.0.1:60055/api/users", {
+        headers: { Authorization: token() },
+      });
+      console.log(await response.text());
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div class={styles.App}>
       {JSON.stringify(user() || {})}
@@ -58,6 +71,14 @@ const App: Component = () => {
         value={last()}
         onInput={(e) => setLast((e.target as HTMLInputElement).value)}
       />
+
+      <button
+        class="btn btn-primary"
+        onClick={makeCall}
+        disabled={!isAuthenticated()}
+      >
+        Call
+      </button>
     </div>
   );
 };

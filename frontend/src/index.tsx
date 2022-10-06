@@ -8,7 +8,8 @@ render(
   () => (
     <Auth0
       domain="dev-cbdrgzv1.us.auth0.com"
-      clientId="vX5z0xrgW89EYHI3OueNP3bH5r3PCtQo"
+      clientId="7oylbOMFecpQgTflRNOqgnyQAvRX8rnp"
+      audience="cost-return-api"
       logoutRedirectUri={`${window.location.origin}/logout`}
       loginRedirectUri={`${window.location.origin}/`}
     >
