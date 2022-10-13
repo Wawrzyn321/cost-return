@@ -8,7 +8,7 @@ ExecStart=python3 server.py
 Restart=on-failure
 User=ubuntu
 
-Environment=ENV=production REMOTE_ADDRESS='http://127.0.0.1:8888' 
+Environment=ENV=production EMAIL PASSWORD REMOTE_ADDRESS='http://127.0.0.1:8090' 
 
 [Install]
 WantedBy=multi-user.target

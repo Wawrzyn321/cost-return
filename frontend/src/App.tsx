@@ -32,7 +32,7 @@ const App: Component = () => {
     console.log(token);
     console.log(token());
     try {
-      const response = await fetch("http://127.0.0.1:60055/api/users", {
+      const response = await fetch("http://127.0.0.1:60057/api/users", {
         headers: { Authorization: token() },
       });
       console.log(await response.text());
