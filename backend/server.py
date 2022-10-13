@@ -5,14 +5,20 @@ import requests
 import os
 from werkzeug.routing import Rule
 import jwt
+import json
 
-ALLOWED_PROFILES = ['google-oauth2|114938617275240442581']
+ALLOWED_PROFILES = [{
+    'googleId': 'google-oauth2|114938617275240442581',
+    'nickname': 'Wawrzyn'
+}]
 
 PORT = int(os.getenv('PORT') or '60055')
 ENV = (os.getenv('ENV') or 'DEV').upper()
 REMOTE_ADDRESS = os.environ['REMOTE_ADDRESS']
 EMAIL = os.environ['EMAIL']
 PASSWORD = os.environ['PASSWORD']
+
+pocketbase_client = PocketBase(REMOTE_ADDRESS)
 
 def validate_token(token):
     try:
@@ -47,27 +53,44 @@ def validate_token(token):
         print(e)
         return (False, 401)
 
+def get_admin_token():
+    admin_data = pocketbase_client.admins.auth_via_email(EMAIL, PASSWORD)
+    return admin_data.token
+
+
 def make_headers(flaskheaders):
-        client = PocketBase(REMOTE_ADDRESS)
-        admin_data = client.admins.auth_via_email(EMAIL, PASSWORD)
+    headers = {}
+    for k, v in flaskheaders:
+        headers[k] = v
+    
+    headers['Authorization'] = 'Admin ' + get_admin_token()
 
-        headers = {}
+    return headers
 
-        for k, v in flaskheaders:
-            headers[k] = v
-        headers['Authorization'] = 'Admin ' + admin_data.token
-
-        return headers
+def seed_db():
+    for profile in ALLOWED_PROFILES:
+        result = requests.request('GET',
+                REMOTE_ADDRESS +"/api/collections/users/records/?filter=(googleId='"+profile['googleId']+"')",
+                headers=make_headers(dict()))
+        if len(json.loads(result.content)['items']) == 0:
+            result = requests.request('POST',
+                REMOTE_ADDRESS +"/api/collections/users/records",
+                json=profile,
+                headers=make_headers(dict()))
+            print('PUT', profile['googleId'])
+        else:
+            print(profile['googleId'], 'is present')
 
 app = flask.Flask(__name__)
 app.url_map.add(Rule('/', endpoint='index'))
 app.url_map.add(Rule('/<path:path>', endpoint='index'))
 CORS(app, supports_credentials=True)
 
+seed_db()
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index(path=''):
-
     if flask.request.method == 'OPTIONS':
         return '', 200
 
