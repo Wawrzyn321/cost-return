@@ -15,7 +15,6 @@ EMAIL = os.environ['EMAIL']
 PASSWORD = os.environ['PASSWORD']
 
 def validate_token(token):
-    print(token)
     try:
         alg = jwt.get_unverified_header(token)['alg']
 
@@ -35,8 +34,8 @@ def validate_token(token):
             audience=AUDIENCE
             )
 
-        if not profile.sub in ALLOWED_PROFILES:
-            return (false, 403)
+        if not profile['sub'] in ALLOWED_PROFILES:
+            return (False, 403)
         return (True, None)
     except jwt.DecodeError as e:
         print('jwt.DecodeError', e)
@@ -63,11 +62,11 @@ def make_headers(flaskheaders):
 app = flask.Flask(__name__)
 app.url_map.add(Rule('/', endpoint='index'))
 app.url_map.add(Rule('/<path:path>', endpoint='index'))
-CORS(app)
+CORS(app, supports_credentials=True)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def index(path):
+def index(path=''):
 
     if flask.request.method == 'OPTIONS':
         return '', 200
@@ -93,6 +92,6 @@ print('Starting the', ENV, ' server on ', PORT)
 if ENV == 'PRODUCTION':
     print('PROD')
     from waitress import serve
-    serve(app, port=PORT)
+    serve(app, port=PORT, HOST='0.0.0.0', url_scheme='https')
 else:
     app.run(port=PORT)
