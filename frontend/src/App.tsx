@@ -32,7 +32,10 @@ const App: Component = () => {
     console.log(token);
     console.log(token());
     try {
-      const response = await fetch("http://127.0.0.1:60057/api/users", {
+      const ADDRESS = true
+        ? "https://cost-return-backend.oto-jest-wawrzyn.pl"
+        : "http://127.0.0.1:60057/api/users";
+      const response = await fetch(ADDRESS, {
         headers: { Authorization: token() },
       });
       console.log(await response.text());
