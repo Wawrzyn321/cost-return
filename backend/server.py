@@ -40,7 +40,7 @@ def validate_token(token):
             audience=AUDIENCE
             )
 
-        if not profile['sub'] in ALLOWED_PROFILES:
+        if not list(filter(lambda p: p['googleId'] == profile['sub'], ALLOWED_PROFILES)):
             return (False, 403)
         return (True, None)
     except jwt.DecodeError as e:
@@ -115,6 +115,6 @@ print('Starting the', ENV, ' server on ', PORT)
 if ENV == 'PRODUCTION':
     print('PROD')
     from waitress import serve
-    serve(app, port=PORT, HOST='0.0.0.0', url_scheme='https')
+    serve(app, port=PORT, host='0.0.0.0', url_scheme='https')
 else:
     app.run(port=PORT)
