@@ -1,53 +1,77 @@
-import { Component, createEffect, createSignal } from "solid-js";
+import { Component, createEffect, createSignal, For } from "solid-js";
 import { useAuth0 } from "@rturnq/solid-auth0";
 
 import styles from "./App.module.css";
+import { ApiContextProvider, useApiContext } from "./api/ApiContext";
+import { ResponseContent } from "./api/responseTypes";
+import { Collection } from "./api/types";
+import PocketBase from 'pocketbase'
 
-// const configureClient = async () => {
-//   return await createAuth0Client({
-//     domain: "dev-cbdrgzv1.us.auth0.com",
-//     client_id: "vX5z0xrgW89EYHI3OueNP3bH5r3PCtQo",
-//     redirect_uri: "http://localhost:3000",
-//   });
-// };
+
+window['pocketbase'] = new PocketBase('http://pocketbase-admin.oto-jest-wawrzyn.pl');
+
+const AuthenticatedPart: Component = () => {
+  const getApi = useApiContext();
+  const [collections, setCollections] =
+    createSignal<ResponseContent<Collection> | null>(null);
+
+  const [error, setError] = createSignal<Error | null>();
+
+  const callApi = async () => {
+    const response = await getApi!()!.collections.getAll();
+    if (response instanceof Error) {
+      setError(response);
+    } else {
+      console.log(response);
+      setCollections(response);
+    }
+  };
+
+  return (
+    <>
+      {!collections() && <button onClick={callApi}>A</button>}
+      {error() && <p>{error()?.message}</p>}
+      {collections() && (
+        <>
+          LISTA
+          <ul>
+            <For each={collections()?.items}>
+              {(col) => <li>{col.name}</li>}
+            </For>
+          </ul>
+        </>
+      )}
+    </>
+  );
+};
 
 const App: Component = () => {
   const [first, setFirst] = createSignal("JSON");
   const [last, setLast] = createSignal("Bourne");
-  const [token, setToken] = createSignal("");
 
   createEffect(() => console.log(`${first()} ${last()}!`));
 
   const client = useAuth0()!;
   const { isAuthenticated, user, loginWithRedirect, logout, getToken } = client;
 
-  createEffect(async () => {
-    if (isAuthenticated()) {
-      console.log("get token...");
-      setToken(await getToken());
-    }
-  });
-
-  const makeCall = async () => {
-    console.log(token);
-    console.log(token());
-    try {
-      const ADDRESS = true
-        ? "https://cost-return-backend.oto-jest-wawrzyn.pl"
-        : "http://127.0.0.1:60057/api/users";
-      const response = await fetch(ADDRESS, {
-        headers: { Authorization: token() },
-      });
-      console.log(await response.text());
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const makeCall = async () => {
+  //   console.log(token());
+  //   try {
+  //     const ADDRESS = true
+  //       ? "https://cost-return-backend.oto-jest-wawrzyn.pl"
+  //       : "http://127.0.0.1:60057/api/users";
+  //     const response = await fetch(ADDRESS, {
+  //       headers: { Authorization: token() },
+  //     });
+  //     console.log(await response.text());
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   return (
     <div class={styles.App}>
       {JSON.stringify(user() || {})}
-      <p>Token: {token()}</p>
       <div>
         <button
           class="btn btn-primary"
@@ -75,13 +99,11 @@ const App: Component = () => {
         onInput={(e) => setLast((e.target as HTMLInputElement).value)}
       />
 
-      <button
-        class="btn btn-primary"
-        onClick={makeCall}
-        disabled={!isAuthenticated()}
-      >
-        Call
-      </button>
+      {isAuthenticated() && (
+        <ApiContextProvider>
+          <AuthenticatedPart />
+        </ApiContextProvider>
+      )}
     </div>
   );
 };
