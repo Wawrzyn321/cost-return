@@ -1,0 +1,103 @@
+:root {
+  --underwater-height: 4vh;
+  --wave-height: 8vh;
+}
+
+/* https://wweb.dev/resources/css-separator-generator/ */
+.container {
+  background: #1a3c5d;
+  height: var(--underwater-height);
+  width: 100vw;
+  z-index: -1;
+}
+
+.container--bottom {
+  top: var(--wave-height);
+}
+
+.wave {
+  position: absolute;
+  top: var(--underwater-height);
+  height: 70px;
+  width: 100%;
+  background: #1a3c5d;
+  bottom: 0;
+  z-index: -1;
+  animation: waving 6s ease-in-out infinite alternate;
+}
+
+.wave--bottom {
+  top: unset;
+  bottom: var(--underwater-height);
+}
+
+.wave::before,
+.wave::after {
+  content: "";
+  display: block;
+  position: absolute;
+  border-radius: 100% 50%;
+  z-index: -1;
+}
+
+.wave::before {
+  width: 55%;
+  height: 109%;
+  background-color: #fff;
+  right: -1.5%;
+  top: 60%;
+}
+.wave::after {
+  width: 55%;
+  height: 100%;
+  background-color: #1a3c5d;
+  left: -1.5%;
+  top: 40%;
+}
+
+.wave--bottom::before {
+  right: 35.5%;
+  top: -80%;
+  width: 70%;
+}
+
+.wave--bottom::after {
+  left: 48.5%;
+  top: -28%;
+}
+
+@keyframes waving {
+  from {
+    height: 30px;
+  }
+  to {
+    height: 50px;
+  }
+}
+
+.content {
+  height: calc(100vh - 3 * var(--wave-height));
+}
+
+.v-spacer {
+  height: var(--wave-height);
+}
+
+.nav {
+  display: flex;
+  color: white;
+  width: 100vw;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+  line-height: 3em;
+  font-size: xx-large;
+  margin-left: 5vw;
+}
+
+.state {
+  margin-right: 5vw;
+  margin-top: 3vh;
+}

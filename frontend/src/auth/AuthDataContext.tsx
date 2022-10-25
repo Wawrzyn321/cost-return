@@ -1,0 +1,75 @@
+import { login } from "./login";
+
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  JSX,
+  useContext,
+} from "solid-js";
+import { useAuth0 } from "@rturnq/solid-auth0";
+
+export type AuthData = {
+  auth0Token: string;
+  pocketbaseToken: string;
+  pocketbaseUserId: string;
+};
+
+export type AuthDataContextType = {
+  authData: Accessor<AuthData | null>;
+  state: Accessor<string | null>;
+};
+
+const AuthDataContext = createContext<AuthDataContextType>();
+
+export const AuthDataProvider = (props: { children: JSX.Element }) => {
+  const [authData, setAuthData] = createSignal<AuthData | null>(null);
+  const [contextState, setContextState] = createSignal<string | null>(null);
+  const [fetchedData, setFetchedData] = createSignal(false);
+
+  const { getToken, isInitialized, isAuthenticated, loginWithRedirect } =
+    useAuth0()!;
+
+  createEffect(async () => {
+    if (isInitialized() && !isAuthenticated()) {
+      setContextState("Logging in...");
+      loginWithRedirect();
+      return;
+    }
+
+    if (fetchedData()) return;
+    setFetchedData(true);
+
+    try {
+      setContextState("Getting auth0 token...");
+      const auth0Token = await getToken();
+      setContextState("Getting DB token...");
+      const { token, userId } = await login(auth0Token);
+
+      setAuthData({
+        auth0Token,
+        pocketbaseToken: token,
+        pocketbaseUserId: userId,
+      });
+      setContextState(null);
+    } catch (e: any) {
+      if (e instanceof Error) {
+        console.log(e);
+        setContextState(`Error: ${e.message}.`);
+      } else {
+        throw e;
+      }
+    }
+  });
+
+  return (
+    <AuthDataContext.Provider value={{ authData, state: contextState }}>
+      {props.children}
+    </AuthDataContext.Provider>
+  );
+};
+
+export const useAuthData = () => {
+  return useContext(AuthDataContext);
+};

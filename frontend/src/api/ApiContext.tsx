@@ -7,69 +7,75 @@ import {
   JSX,
   useContext,
 } from "solid-js";
+import { AuthData, useAuthData } from "../auth/AuthDataContext";
 import { GetAllResponse } from "./responseTypes";
 // import { createApi, Api } from "./createApi";
 import { Collection } from "./types";
 
-type Api = {
-  collections: {
-    getAll: () => Promise<GetAllResponse<Collection>>;
-  };
+type ResourceApi<T> = {
+  getAll: () => Promise<GetAllResponse<T>>;
 };
 
-const createApi = ({
-  token,
-  userId,
-}: {
-  token: string;
-  userId: string;
-}): Api => {
-  const baseUrl = import.meta.env.VITE_BACKEND_URL;
-  const collectionsUrl = `${baseUrl}/collections`;
+type Api = {
+  collections: ResourceApi<Collection>;
+};
 
+function createApi<T>(
+  collectionType: string,
+  { auth0Token, pocketbaseToken }: AuthData
+): ResourceApi<T> {
+  const baseUrl = import.meta.env.VITE_BACKEND_URL;
+  const url = `${baseUrl}/api/collections/${collectionType}/records`;
   return {
-    collections: {
-      getAll: async () => {
-        try {
-          const response = await fetch(collectionsUrl, {
-            headers: {
-              Authorization: token,
-            },
-          });
-          if (!response.ok) {
-            throw Error();
-          }
-          return await response.json();
-        } catch (e) {
-          if (e instanceof Error) {
-            return { error: e };
-          } else {
-            console.warn(e);
-            return { error: new Error("unknown error " + e) };
-          }
+    getAll: async () => {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: auth0Token,
+            "X-Cost-Return-PB-Token": pocketbaseToken,
+          },
+        });
+        if (!response.ok) {
+          throw Error();
         }
-      },
+        return await response.json();
+      } catch (e) {
+        if (e instanceof Error) {
+          return { error: e };
+        } else {
+          console.warn(e);
+          return { error: new Error("unknown error " + e) };
+        }
+      }
     },
   };
-};
+}
 
-const ApiContext = createContext<Accessor<Api | undefined>>();
+const ApiContext = createContext<Api>();
 
 export const ApiContextProvider = (props: { children: JSX.Element }) => {
-  const { getToken, user } = useAuth0()!;
+  const { authData } = useAuthData()!;
+  const [api, setApi] = createSignal<Api | null>(null);
 
-  const [api, setApi] = createSignal<Api | undefined>();
-
-  createEffect(async () => {
-    const token = await getToken();
-    console.log("set value");
-    setApi(createApi({ token, userId: user().sub }));
+  createEffect(() => {
+    const data = authData();
+    if (data) {
+      setApi({
+        collections: createApi<Collection>("collections", data),
+      });
+    }
   });
 
   return (
-    <ApiContext.Provider value={api}>
-      {api() ? props.children : "Loading..."}
-    </ApiContext.Provider>
+    <>
+      {api() ? (
+        <ApiContext.Provider value={api()!}>
+          {props.children}
+        </ApiContext.Provider>
+      ) : (
+        "LOADING"
+      )}
+    </>
   );
 };
 
