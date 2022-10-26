@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "start": "VITE_BACKEND_URL='http://localhost:60055' vite",
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "VITE_BACKEND_URL='https://localhost:60055' vite",
+    "build": "VITE_BACKEND_URL='https://cost-return-backend.oto-jest-wawrzyn.pl' vite build",
     "serve": "vite preview"
   },
   "license": "MIT",
