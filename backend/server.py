@@ -21,23 +21,22 @@ PASSWORD = os.environ['PASSWORD']
 ADMIN_TOKEN_LIFETIME_S = int(os.getenv('ADMIN_TOKEN_LIFETIME_S') or 60 * 60 * 24)
 SERVER_SECRET = os.environ['SERVER_SECRET']
 
-pocketbase_client = PocketBase(REMOTE_ADDRESS)
+pocketbase_admin_client = PocketBase(REMOTE_ADDRESS)
+pocketbase_user_client = PocketBase(REMOTE_ADDRESS)
+
+last_admin_login_unix = None
 
 
-#  todo use 2 clients, one admin, one impersonating
-# last_admin_login_unix = None
+def ensure_admin_login():
+    global last_admin_login_unix
 
-
-# def ensure_admin_login(force=False):
-#     global last_admin_login_unix
-#
-#     if not last_admin_login_unix or force:
-#         pocketbase_client.admins.auth_via_email(EMAIL, PASSWORD)
-#         last_admin_login_unix = int(time.time())
-#     else:
-#         if time.time() - last_admin_login_unix > ADMIN_TOKEN_LIFETIME_S * 0.9:
-#             pocketbase_client.admins.auth_via_email(EMAIL, PASSWORD)
-#             last_admin_login_unix = int(time.time())
+    if not last_admin_login_unix:
+        pocketbase_admin_client.admins.auth_via_email(EMAIL, PASSWORD)
+        last_admin_login_unix = int(time.time())
+    else:
+        if time.time() - last_admin_login_unix > ADMIN_TOKEN_LIFETIME_S * 0.9:
+            pocketbase_admin_client.admins.auth_via_email(EMAIL, PASSWORD)
+            last_admin_login_unix = int(time.time())
 
 
 def validate_token(token):
@@ -76,10 +75,10 @@ CORS(app, supports_credentials=True, )
 
 
 def handle_login(profile):
-    pocketbase_client.admins.auth_via_email(EMAIL, PASSWORD)
+    ensure_admin_login()
 
     def user_exists(possible_user_email):
-        return possible_user_email in [u.email for u in pocketbase_client.users.get_full_list()]
+        return possible_user_email in [u.email for u in pocketbase_admin_client.users.get_full_list()]
 
     def make_login_data(user_id):
         generated_email = user_id + '@cost-return.oto-jest-wawrzyn.pl'
@@ -89,25 +88,25 @@ def handle_login(profile):
     email, password = make_login_data(profile)
 
     if not user_exists(email):
-        pocketbase_client.users.create({
+        pocketbase_admin_client.users.create({
             'email': email,
             'password': password,
             'passwordConfirm': password
         })
 
-    login_response = pocketbase_client.users.auth_via_email(email, password)
-
+    login_response = pocketbase_user_client.users.auth_via_email(email, password)
     data = {
         'token': login_response.token,
-        'userId': login_response.user.id
+        'userId': login_response.user.id,
+        'profileId': login_response.user.profile.id
     }
-
     return data, 200
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
+@app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def index(path=''):
+    t = time.time()
     if flask.request.method == 'OPTIONS':
         return '', 200
 
@@ -120,15 +119,19 @@ def index(path=''):
         try:
             return handle_login(profile)
         except pocketbase.ClientResponseError as e:
-            return e.data, e.status
+            return e.data or 'unknown error', e.status
 
     url = REMOTE_ADDRESS + "/" + path
-    pb_token = flask.request.headers.get('X-Cost-Return-PB-Token')
-    print(flask.request.method, url, pb_token)
 
-    headers = {
-        'Authorization': f'User {pb_token}'
-    }
+    headers = {}
+
+    pb_token = flask.request.headers.get('X-Cost-Return-PB-Token')
+    headers['Authorization'] = f'User {pb_token}'
+
+    content_type = flask.request.headers.get('Content-Type')
+    if content_type:
+        headers['Content-Type'] = content_type
+
     try:
         session = requests.Session()
         retry = Retry(connect=3, backoff_factor=0.5)
@@ -142,7 +145,7 @@ def index(path=''):
         return result.content, result.status_code
     except Exception as e:
         print(e)
-        return 'BRZYDKO', 400
+        return 'Request error', 400
 
 
 print('Starting the', ENV, ' server on ', PORT)

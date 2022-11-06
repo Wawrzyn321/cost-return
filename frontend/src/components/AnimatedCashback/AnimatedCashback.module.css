@@ -1,0 +1,25 @@
+.ball {
+  transform: translateY(12px);
+}
+
+.hand {
+  transform: translateY(-12px);
+}
+
+.ball {
+  animation: rotate360 0.6s infinite alternate;
+  animation-timing-function: cubic-bezier(0.36, -0.03, 0.86, 0.66);
+  animation-play-state: paused;
+}
+.hover {
+  animation-play-state: running;
+}
+
+@keyframes rotate360 {
+  0% {
+    transform: translateY(12px);
+  }
+  100% {
+    transform: translateY(28px);
+  }
+}

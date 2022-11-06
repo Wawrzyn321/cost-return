@@ -14,6 +14,7 @@ export type AuthData = {
   auth0Token: string;
   pocketbaseToken: string;
   pocketbaseUserId: string;
+  pocketbaseProfileId: string;
 };
 
 export type AuthDataContextType = {
@@ -45,12 +46,17 @@ export const AuthDataProvider = (props: { children: JSX.Element }) => {
       setContextState("Getting auth0 token...");
       const auth0Token = await getToken();
       setContextState("Getting DB token...");
-      const { token, userId } = await login(auth0Token);
+      const {
+        token: pocketbaseToken,
+        userId: pocketbaseUserId,
+        profileId: pocketbaseProfileId,
+      } = await login(auth0Token);
 
       setAuthData({
         auth0Token,
-        pocketbaseToken: token,
-        pocketbaseUserId: userId,
+        pocketbaseToken: pocketbaseToken,
+        pocketbaseUserId: pocketbaseUserId,
+        pocketbaseProfileId: pocketbaseProfileId,
       });
       setContextState(null);
     } catch (e: any) {

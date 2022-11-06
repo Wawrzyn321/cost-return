@@ -1,0 +1,11 @@
+.header {
+  display: flex;
+  line-height: 3em;
+  font-size: xx-large;
+  margin-left: 5vw;
+}
+
+.state {
+  margin-right: 5vw;
+  margin-top: 3vh;
+}

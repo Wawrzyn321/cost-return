@@ -7,3 +7,7 @@ export type ResponseContent<T> = {
 };
 
 export type GetAllResponse<T> = ResponseContent<T> | Error;
+
+export type CreateOneResponse<T> = T | Error;
+
+export type DeleteOneResponse = void | Error;

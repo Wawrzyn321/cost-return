@@ -1,55 +1,18 @@
-import { useAuth0 } from "@rturnq/solid-auth0";
 import {
-  Accessor,
   createContext,
   createEffect,
   createSignal,
   JSX,
   useContext,
 } from "solid-js";
-import { AuthData, useAuthData } from "../auth/AuthDataContext";
-import { GetAllResponse } from "./responseTypes";
-// import { createApi, Api } from "./createApi";
-import { Collection } from "./types";
-
-type ResourceApi<T> = {
-  getAll: () => Promise<GetAllResponse<T>>;
-};
+import { useAuthData } from "../auth/AuthDataContext";
+import { createApi, ResourceApi } from "./createApi";
+import { Collection, CollectionEntry } from "./types";
 
 type Api = {
   collections: ResourceApi<Collection>;
+  collectionEntries: ResourceApi<CollectionEntry>;
 };
-
-function createApi<T>(
-  collectionType: string,
-  { auth0Token, pocketbaseToken }: AuthData
-): ResourceApi<T> {
-  const baseUrl = import.meta.env.VITE_BACKEND_URL;
-  const url = `${baseUrl}/api/collections/${collectionType}/records`;
-  return {
-    getAll: async () => {
-      try {
-        const response = await fetch(url, {
-          headers: {
-            Authorization: auth0Token,
-            "X-Cost-Return-PB-Token": pocketbaseToken,
-          },
-        });
-        if (!response.ok) {
-          throw Error();
-        }
-        return await response.json();
-      } catch (e) {
-        if (e instanceof Error) {
-          return { error: e };
-        } else {
-          console.warn(e);
-          return { error: new Error("unknown error " + e) };
-        }
-      }
-    },
-  };
-}
 
 const ApiContext = createContext<Api>();
 
@@ -62,6 +25,10 @@ export const ApiContextProvider = (props: { children: JSX.Element }) => {
     if (data) {
       setApi({
         collections: createApi<Collection>("collections", data),
+        collectionEntries: createApi<CollectionEntry>(
+          "collectionEntries",
+          data
+        ),
       });
     }
   });
@@ -73,7 +40,14 @@ export const ApiContextProvider = (props: { children: JSX.Element }) => {
           {props.children}
         </ApiContext.Provider>
       ) : (
-        "LOADING"
+        <div class="flex justify-center items-center">
+          <div
+            class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
+            role="status"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
       )}
     </>
   );

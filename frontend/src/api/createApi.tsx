@@ -1,9 +1,14 @@
-import { GetAllResponse } from "./responseTypes";
+import {
+  CreateOneResponse,
+  GetAllResponse,
+  DeleteOneResponse,
+} from "./responseTypes";
+import { AuthData } from "../auth/AuthDataContext";
 
-type ApiProps = {
-  token: string;
-  userId: string;
-  resourceName: string;
+export type ResourceApi<T> = {
+  getAll: () => Promise<GetAllResponse<T>>;
+  createOne: (body: any) => Promise<CreateOneResponse<T>>;
+  deleteOne: (id: string) => Promise<DeleteOneResponse>;
 };
 
 type FetchProps = {
@@ -12,18 +17,13 @@ type FetchProps = {
   body?: any;
 };
 
-export type Api<T> = {
-  getAll: () => Promise<GetAllResponse<T>>;
-};
-
-export function createApi<T>({
-  token,
-  userId,
-  resourceName,
-}: ApiProps): Api<T> {
+export function createApi<T>(
+  collectionType: string,
+  { auth0Token, pocketbaseToken }: AuthData
+): ResourceApi<T> {
   const baseUrl = `${
     import.meta.env.VITE_BACKEND_URL
-  }/collections/${resourceName}/records/`; // todo
+  }/api/collections/${collectionType}/records`;
 
   const doFetch = async ({
     url = "",
@@ -31,13 +31,18 @@ export function createApi<T>({
     body,
   }: FetchProps = {}) => {
     const headers: any = {
-      Authorization: token,
+      Authorization: auth0Token,
+      "X-Cost-Return-PB-Token": pocketbaseToken,
+      ...(typeof body === "object"
+        ? { "Content-Type": "application/json" }
+        : {}),
     };
-    if (body) {
-      headers.body = typeof body === "object" ? JSON.stringify(body) : body;
-    }
     try {
-      const response = await fetch(baseUrl + url, { method, headers });
+      const response = await fetch(baseUrl + url, {
+        method,
+        headers,
+        body: typeof body === "object" ? JSON.stringify(body) : body,
+      });
       if (!response.ok) {
         throw Error();
       }
@@ -53,6 +58,13 @@ export function createApi<T>({
   };
 
   return {
-    getAll: async (): Promise<GetAllResponse<T>> => await doFetch({}),
+    getAll: async () => await doFetch({}),
+    createOne: async (body: any) =>
+      await doFetch({
+        method: "POST",
+        body,
+      }),
+    deleteOne: async (id: string) =>
+      await doFetch({ method: "DELETE", url: "/" + id }),
   };
 }

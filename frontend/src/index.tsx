@@ -1,7 +1,7 @@
 import { Auth0 } from "@rturnq/solid-auth0";
 import { render } from "solid-js/web";
 import { ApiContextProvider } from "./api/ApiContext";
-import { Background } from "./Background";
+import { Layout } from "./components/Layout/Layout";
 import { AuthDataProvider } from "./auth/AuthDataContext";
 import App from "./App";
 
@@ -17,11 +17,11 @@ render(
       loginRedirectUri={`${window.location.origin}/`}
     >
       <AuthDataProvider>
-        <Background>
+        <Layout>
           <ApiContextProvider>
             <App />
           </ApiContextProvider>
-        </Background>
+        </Layout>
       </AuthDataProvider>
     </Auth0>
   ),

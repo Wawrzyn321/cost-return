@@ -1,16 +1,18 @@
+type DateString = string;
+
 export type Collection = {
   id: string;
   gUserId: string;
   name: string;
   startingAmount: number;
-  startDate: Date;
-  created: Date;
+  created: DateString;
+  entries: string[];
 };
 
-export type CollectionEntries = {
+export type CollectionEntry = {
   id: string;
   collectionId: string;
   amount: number;
   comment: string;
-  created: Date;
+  created: DateString;
 };

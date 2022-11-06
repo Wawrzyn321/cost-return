@@ -1,6 +1,7 @@
 type LoginResponse = {
   token: string;
   userId: string;
+  profileId: string;
 };
 
 export async function login(auth0Token: string): Promise<LoginResponse> {
