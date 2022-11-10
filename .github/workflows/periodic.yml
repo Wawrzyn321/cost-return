@@ -1,0 +1,11 @@
+name: Periodic-test
+on:
+  schedule:
+    - cron: "*/6 * * * *"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tets
+        run: echo "test"
