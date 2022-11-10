@@ -1,5 +1,7 @@
 name: Periodic-test
 on:
+  push:
+  pull_request:
   schedule:
     - cron: "*/6 * * * *"
   workflow_dispatch:
