@@ -1,21 +1,23 @@
 import { createSignal } from "solid-js";
-import { useApiContext } from "./api/ApiContext";
-import { Collection } from "./api/types";
-import { useAuthData } from "./auth/AuthDataContext";
-import sharedStyles from "./components/shared.module.css";
+import { useApiContext } from "../api/ApiContext";
+import { Collection } from "../api/types";
+import { useAuthData } from "../auth/AuthDataContext";
+import { Alert } from "./errors/Alert";
+import sharedStyles from "./../components/shared.module.css";
+import { AsyncStatus } from "./errors/AsyncStatus";
+import { BsHourglassSplit } from "solid-icons/bs";
 
 type NewCollectionFormProps = {
   hide: () => void;
   addCollection: (collection: Collection) => void;
 };
 
-// function Input({name, value, onChange, ...props}) todo ale z ładnymi mergeProps i splitProps z solida
-
 export function NewCollectionForm(props: NewCollectionFormProps) {
   let form: HTMLFormElement | undefined = undefined;
   const [formValid, setFormValid] = createSignal(false);
   const [name, setName] = createSignal("");
   const [startingAmount, setStartingAmount] = createSignal(0);
+  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>("none");
   const api = useApiContext()!;
   const { authData } = useAuthData()!;
 
@@ -24,19 +26,23 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
   };
 
   const onSubmit = async () => {
+    setSubmitStatus("pending");
     const body = {
       name: name(),
       startingAmount: startingAmount(),
       user: authData()!.pocketbaseProfileId,
     };
 
-    const response = await api.collections.createOne(body);
+    const response = await api()!.collections.createOne(body);
     if (response instanceof Error) {
-      console.log(response);
+      setSubmitStatus(response);
     } else {
       props.addCollection(response);
+      setSubmitStatus("none");
     }
   };
+
+  const isCreatePending = () => submitStatus() === "pending";
 
   return (
     <li class={"carousel-item block " + sharedStyles["collection-item"]}>
@@ -87,12 +93,16 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
           </label>
         </form>
         <button
-          disabled={!formValid()}
+          disabled={!formValid() || isCreatePending()}
           class="btn btn-sm bg-bg text-xl ml-auto mt-2"
           onClick={onSubmit}
         >
+          {isCreatePending() && <BsHourglassSplit class="swingy" />}
           Add
         </button>
+        {submitStatus() instanceof Error && (
+          <Alert message={submitStatus().toString()} />
+        )}
       </div>
     </li>
   );

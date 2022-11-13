@@ -40,3 +40,23 @@ body {
 .color-page {
   color: var(--page-color);
 }
+
+.swingy {
+  animation: swingy 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  margin-right: 10px;
+}
+
+@keyframes swingy {
+  0% {
+    transform: rotate(-30deg);
+  }
+  20% {
+    transform: rotate(30deg);
+  }
+  40% {
+    transform: rotate(-30deg);
+  }
+  100% {
+    transform: rotate(330deg);
+  }
+}

@@ -24,7 +24,11 @@ export function Header() {
             <button class="has-underline" onClick={logout}>
               Logout
             </button>
-            <div class="bg-secondary ml-2 p-0.5">{userInitials()}</div>
+            <div class="avatar placeholder ml-2">
+              <div class="bg-secondary text-neutral-content rounded-full w-8">
+                <span class="text-xs">{userInitials()}</span>
+              </div>
+            </div>
           </div>
         )}
       </p>

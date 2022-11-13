@@ -1,0 +1,10 @@
+.entries-grid {
+  display: grid;
+  grid-template-columns: 5fr 2fr 3fr 1fr;
+  border-top: 1px solid black;
+  height: 3rem;
+}
+
+.delete-button-wrapper {
+  height: 3rem; /*it broke if an element was added*/
+}

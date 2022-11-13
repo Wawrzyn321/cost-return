@@ -94,6 +94,8 @@ def handle_login(profile):
             'passwordConfirm': password
         })
 
+        # pocketbase_admin_client.
+
     login_response = pocketbase_user_client.users.auth_via_email(email, password)
     data = {
         'token': login_response.token,
@@ -121,8 +123,7 @@ def index(path=''):
         except pocketbase.ClientResponseError as e:
             return e.data or 'unknown error', e.status
 
-    url = REMOTE_ADDRESS + "/" + path
-
+    url = REMOTE_ADDRESS + "/" + path + "?" + flask.request.query_string.decode("utf-8")
     headers = {}
 
     pb_token = flask.request.headers.get('X-Cost-Return-PB-Token')

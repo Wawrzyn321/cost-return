@@ -15,6 +15,7 @@ type FetchProps = {
   url?: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: any;
+  transformFn?: (any: any) => any;
 };
 
 export function createApi<T>(
@@ -29,6 +30,7 @@ export function createApi<T>(
     url = "",
     method = "GET",
     body,
+    transformFn = (d: any) => d,
   }: FetchProps = {}) => {
     const headers: any = {
       Authorization: auth0Token,
@@ -46,7 +48,7 @@ export function createApi<T>(
       if (!response.ok) {
         throw Error();
       }
-      return await response.json();
+      return transformFn(await response.json());
     } catch (e) {
       if (e instanceof Error) {
         return { error: e };
@@ -58,7 +60,11 @@ export function createApi<T>(
   };
 
   return {
-    getAll: async () => await doFetch({}),
+    getAll: async () =>
+      await doFetch({
+        url: "?sort=-created",
+        transformFn: ({ items }) => items,
+      }),
     createOne: async (body: any) =>
       await doFetch({
         method: "POST",

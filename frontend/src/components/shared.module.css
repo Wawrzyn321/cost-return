@@ -1,16 +1,15 @@
 .collection-item {
   height: 100%;
   margin-top: calc(var(--content-height) / 8);
-  margin-right: 8vw;
+  margin-right: 4rem;
   display: inline-block;
-  width: 25em;
+  width: 30rem;
   background: rgb(244, 244, 244);
   padding: 20px;
   border-radius: 25px;
 }
 
 .collection-item > header {
-  border-bottom: 1px solid black;
   display: grid;
   grid-template-columns: 5fr 1fr;
 }
@@ -18,4 +17,5 @@
 .collection-item > header > h1 {
   height: 3rem;
   line-height: 3rem;
+  font-weight: bolder;
 }

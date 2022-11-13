@@ -1,6 +1,9 @@
 import { Collection, CollectionEntry } from "../../api/types";
 import { createSignal } from "solid-js";
 import { useApiContext } from "../../api/ApiContext";
+import { AsyncStatus } from "../errors/AsyncStatus";
+import { Alert } from "../errors/Alert";
+import { BsHourglassSplit } from "solid-icons/bs";
 
 type NewEntryFormProps = {
   collection: Collection;
@@ -12,6 +15,7 @@ export function NewEntryForm(props: NewEntryFormProps) {
   const [formValid, setFormValid] = createSignal(false);
   const [comment, setComment] = createSignal("");
   const [amount, setAmount] = createSignal(0);
+  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>("none");
   const api = useApiContext()!;
 
   const onInput = () => {
@@ -19,21 +23,25 @@ export function NewEntryForm(props: NewEntryFormProps) {
   };
 
   const onSubmit = async () => {
+    setSubmitStatus("pending");
     const body = {
       comment: comment(),
       amount: amount(),
       collectionId: props.collection.id,
     };
 
-    const response = await api.collectionEntries.createOne(body);
+    const response = await api()!.collectionEntries.createOne(body);
     if (response instanceof Error) {
-      console.log(response);
+      setSubmitStatus(response);
     } else {
       props.addEntry(response);
       setComment("");
       setAmount(0);
+      setSubmitStatus("none");
     }
   };
+
+  const isCreatePending = () => submitStatus() === "pending";
 
   return (
     <form ref={form} onInput={onInput}>
@@ -71,11 +79,15 @@ export function NewEntryForm(props: NewEntryFormProps) {
           type="button"
           onClick={onSubmit}
           class="btn bg-bg"
-          disabled={!formValid()}
+          disabled={!formValid() || isCreatePending ()}
         >
+          {isCreatePending () && <BsHourglassSplit class="swingy" />}
           Add
         </button>
       </div>
+      {submitStatus() instanceof Error && (
+        <Alert message={submitStatus().toString()} />
+      )}
     </form>
   );
 }

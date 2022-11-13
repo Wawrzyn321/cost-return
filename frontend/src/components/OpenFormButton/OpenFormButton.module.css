@@ -18,3 +18,7 @@
 .add-new:hover {
   transform: translateX(-50px);
 }
+
+.skeleton {
+  transform: translateX(-100px);
+}

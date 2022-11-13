@@ -1,10 +1,14 @@
 import sharedStyles from "./../shared.module.css";
 import { Collection, CollectionEntry } from "../../api/types";
-import { For } from "solid-js";
-import styles from "./CollectionItem.module.css";
+import { createSignal, For } from "solid-js";
 import { NewEntryForm } from "./NewEntryForm";
-import { TimeAgo } from "./TimeAgo";
 import { useApiContext } from "../../api/ApiContext";
+import { BsExclamationCircle, BsTrash } from "solid-icons/bs";
+import { Entry } from "./Entry/Entry";
+import { AsyncStatus } from "../errors/AsyncStatus";
+import { BsHourglassSplit } from "solid-icons/bs";
+import { PaidBadge } from "./PaidBadge/PaidBadge";
+import { ProgressBar } from "./Entry/PogressBar/ProgressBar";
 
 type CollectionItemProps = {
   collection: Collection;
@@ -16,8 +20,9 @@ type CollectionItemProps = {
 
 export function CollectionItem(props: CollectionItemProps) {
   const api = useApiContext()!;
+  const [deleteStatus, setDeleteStatus] = createSignal<AsyncStatus>("none");
 
-  const amountAlreadyTodoChangeName = () =>
+  const amountPaid = () =>
     Math.min(
       props.collection.startingAmount,
       props.entries.reduce((acc, curr) => acc + curr.amount, 0)
@@ -25,37 +30,53 @@ export function CollectionItem(props: CollectionItemProps) {
 
   const entriesCount = () => props.entries.length;
 
-  const deleteEntry = async (id: string) => {
-    const response = await api.collectionEntries.deleteOne(id);
-    if (response instanceof Error) {
-      console.log(response);
-    } else {
-      props.onEntryDelete(id);
-    }
-  };
-
   const deleteCollection = async () => {
+    setDeleteStatus("pending");
     const { id } = props.collection;
-    const response = await api.collections.deleteOne(id);
+    const response = await api()!.collections.deleteOne(id);
     if (response instanceof Error) {
-      console.log(response);
+      setDeleteStatus(response);
     } else {
       props.onCollectionDelete(id);
     }
   };
 
+  const isDeletePending = () => deleteStatus() === "pending";
+
   return (
     <li class={"carousel-item block border " + sharedStyles["collection-item"]}>
       <header>
-        <h1>{props.collection.name}</h1>
-        <div class="grid gap-4 place-items-center" style={{ "grid-template-columns": "1fr 1fr" }}>
+        <h1>
+          {props.collection.name}
+          {amountPaid() === props.collection.startingAmount && <PaidBadge />}
+        </h1>
+        <div
+          class="grid bg-ng gap-4 place-items-center"
+          style={{ "grid-template-columns": "1fr 1fr" }}
+        >
           <p class="text-2xl text-right">
-            {amountAlreadyTodoChangeName()}/{props.collection.startingAmount}
+            {amountPaid()}/{props.collection.startingAmount}
           </p>
-          <button class="btn bg-bg btn-xs" onClick={deleteCollection}>
-            X
+          <button
+            class="btn btn-xs rounded-box h-8"
+            onClick={deleteCollection}
+            disabled={isDeletePending()}
+          >
+            <div class="flex">
+              {isDeletePending() && <BsHourglassSplit class="swingy" />}
+              {deleteStatus() instanceof Error && (
+                <div class="tooltip" data-tip={deleteStatus().toString()}>
+                  <BsExclamationCircle size={18} />
+                </div>
+              )}
+              <BsTrash size={18} />
+            </div>
           </button>
         </div>
+        <ProgressBar
+          value={amountPaid()}
+          max={props.collection.startingAmount}
+        />
       </header>
       <div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box mt-4">
         <input type="checkbox" />
@@ -66,19 +87,7 @@ export function CollectionItem(props: CollectionItemProps) {
           <ul>
             <For each={props.entries}>
               {(entry) => (
-                <li class={styles["entries-grid"]}>
-                  <span>{entry.comment}</span>
-                  <span>-{entry.amount}</span>
-                  <span>
-                    <TimeAgo timestamp={entry.created} />
-                  </span>
-                  <button
-                    class="btn bg-bg btn-xs"
-                    onClick={() => deleteEntry(entry.id)}
-                  >
-                    X
-                  </button>
-                </li>
+                <Entry entry={entry} onEntryDelete={props.onEntryDelete} />
               )}
             </For>
           </ul>
