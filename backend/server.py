@@ -1,5 +1,3 @@
-import json
-
 import flask
 import pocketbase.models
 from flask_cors import CORS
@@ -9,7 +7,6 @@ import os
 import jwt
 import uuid
 import time
-
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -71,7 +68,7 @@ def validate_token(token):
 
 
 app = flask.Flask(__name__)
-CORS(app, supports_credentials=True, )
+CORS(app, supports_credentials=True)
 
 
 def handle_login(profile):
@@ -88,13 +85,25 @@ def handle_login(profile):
     email, password = make_login_data(profile)
 
     if not user_exists(email):
-        pocketbase_admin_client.users.create({
+        u = pocketbase_admin_client.users.create({
             'email': email,
             'password': password,
             'passwordConfirm': password
         })
 
-        # pocketbase_admin_client.
+        starter_collection = {
+            'name': 'An item I have to pay of',
+            'startingAmount': 59.99,
+            'user': u.profile.id
+        }
+        collection = pocketbase_admin_client.records.create('collections', starter_collection)
+
+        starter_collection_entry = {
+            'comment': 'My first payment!',
+            'amount': 10,
+            'collectionId': collection.id
+        }
+        pocketbase_admin_client.records.create('collectionEntries', starter_collection_entry)
 
     login_response = pocketbase_user_client.users.auth_via_email(email, password)
     data = {
