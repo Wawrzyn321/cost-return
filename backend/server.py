@@ -113,25 +113,7 @@ def handle_login(profile):
     }
     return data, 200
 
-
-@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
-@app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
-def index(path=''):
-    t = time.time()
-    if flask.request.method == 'OPTIONS':
-        return '', 200
-
-    token = (flask.request.headers.get('Authorization') or '').replace('Bearer ', '')
-    token_valid, profile, error_status = validate_token(token)
-    if not token_valid:
-        return '', error_status
-
-    if path == 'login':
-        try:
-            return handle_login(profile)
-        except pocketbase.ClientResponseError as e:
-            return e.data or 'unknown error', e.status
-
+def proxy_request(path):
     url = REMOTE_ADDRESS + "/" + path + "?" + flask.request.query_string.decode("utf-8")
     headers = {}
 
@@ -156,6 +138,25 @@ def index(path=''):
     except Exception as e:
         print(e)
         return 'Request error', 400
+
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
+@app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
+def index(path=''):
+    if flask.request.method == 'OPTIONS':
+        return '', 200
+
+    token = (flask.request.headers.get('Authorization') or '').replace('Bearer ', '')
+    token_valid, profile, error_status = validate_token(token)
+    if not token_valid:
+        return '', error_status
+
+    if path == 'login':
+        try:
+            return handle_login(profile)
+        except pocketbase.ClientResponseError as e:
+            return e.data or 'unknown error', e.status
+    else:
+        return proxy_request(path)
 
 
 print('Starting the', ENV, ' server on ', PORT)
