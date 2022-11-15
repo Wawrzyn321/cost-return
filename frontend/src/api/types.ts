@@ -16,3 +16,5 @@ export type CollectionEntry = {
   comment: string;
   created: DateString;
 };
+
+export type AsyncStatus = "none" | "pending" | Error;

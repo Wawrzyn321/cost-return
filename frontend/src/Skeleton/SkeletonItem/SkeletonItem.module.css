@@ -1,0 +1,18 @@
+.loading-wrapper {
+  height: calc(var(--content-height) * 3 / 4);
+  width: 30rem;
+  z-index: 1000;
+}
+
+.loading {
+  animation: roto 0.6s infinite linear;
+}
+
+@keyframes roto {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

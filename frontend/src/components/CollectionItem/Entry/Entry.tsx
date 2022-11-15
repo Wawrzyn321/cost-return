@@ -1,10 +1,9 @@
-import { CollectionEntry } from "../../../api/types";
+import { AsyncStatus, CollectionEntry } from "../../../api/types";
 import styles from "./Entry.module.css";
 import { TimeAgo } from "./TimeAgo";
 import { BsTrash, BsHourglassSplit, BsExclamationCircle } from "solid-icons/bs";
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { useApiContext } from "../../../api/ApiContext";
-import { AsyncStatus } from "../../errors/AsyncStatus";
 
 export function Entry(props: {
   entry: CollectionEntry;
@@ -43,15 +42,17 @@ export function Entry(props: {
           disabled={isDeletePending()}
         >
           <div class="flex">
-            {isDeletePending() && <BsHourglassSplit class="swingy" />}
-            {deleteStatus() instanceof Error && (
+            <Show when={isDeletePending()}>
+              <BsHourglassSplit class="swingy" />
+            </Show>
+            <Show when={deleteStatus() instanceof Error}>
               <div
                 class="tooltip tooltip-left"
                 data-tip={deleteStatus().toString()}
               >
                 <BsExclamationCircle />
               </div>
-            )}
+            </Show>
             <BsTrash />
           </div>
         </button>

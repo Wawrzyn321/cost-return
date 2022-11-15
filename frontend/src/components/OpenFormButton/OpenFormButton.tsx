@@ -12,7 +12,7 @@ export function OpenFormButton(props: ActiveProps) {
       ? styles["add-new--showing-form"]
       : "";
 
-    const skeletonClass = props.skeleton ? styles["skeleton"] : "";
+    const skeletonClass = props.skeleton ? `pointer-events-none ${styles["skeleton"]}` : "";
 
     return `${styles["add-new"]} ${showingFormClass} ${skeletonClass}`;
   };

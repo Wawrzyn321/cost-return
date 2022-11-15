@@ -8,7 +8,6 @@
 
   --bg-color: #1a3c5d;
   --secondary-color: #1990a7;
-  --tertiary-color: #90e0ef;
   --page-color: #fff;
 
   --content-height: calc(100vh - 3 * var(--wave-height));
@@ -59,4 +58,26 @@ body {
   100% {
     transform: rotate(330deg);
   }
+}
+
+.collection-item {
+  height: calc(var(--content-height) * 3 / 4);
+  margin-top: calc(var(--content-height) / 8);
+  margin-right: 4rem;
+  display: inline-block;
+  width: 30rem;
+  background: rgb(244, 244, 244);
+  padding: 20px;
+  border-radius: 25px;
+}
+
+.collection-item > header {
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+}
+
+.collection-item > header > h1 {
+  height: 3rem;
+  line-height: 3rem;
+  font-weight: bolder;
 }

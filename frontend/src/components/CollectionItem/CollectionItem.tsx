@@ -1,11 +1,9 @@
-import sharedStyles from "./../shared.module.css";
-import { Collection, CollectionEntry } from "../../api/types";
-import { createSignal, For } from "solid-js";
+import { AsyncStatus, Collection, CollectionEntry } from "../../api/types";
+import { createSignal, For, Show } from "solid-js";
 import { NewEntryForm } from "./NewEntryForm";
 import { useApiContext } from "../../api/ApiContext";
 import { BsExclamationCircle, BsTrash } from "solid-icons/bs";
 import { Entry } from "./Entry/Entry";
-import { AsyncStatus } from "../errors/AsyncStatus";
 import { BsHourglassSplit } from "solid-icons/bs";
 import { PaidBadge } from "./PaidBadge/PaidBadge";
 import { ProgressBar } from "./Entry/PogressBar/ProgressBar";
@@ -44,11 +42,13 @@ export function CollectionItem(props: CollectionItemProps) {
   const isDeletePending = () => deleteStatus() === "pending";
 
   return (
-    <li class={"carousel-item block border " + sharedStyles["collection-item"]}>
+    <li class="carousel-item block border collection-item">
       <header>
         <h1>
           {props.collection.name}
-          {amountPaid() === props.collection.startingAmount && <PaidBadge />}
+          <Show when={amountPaid() === props.collection.startingAmount}>
+            <PaidBadge />
+          </Show>
         </h1>
         <div
           class="grid bg-ng gap-4 place-items-center"
@@ -63,12 +63,14 @@ export function CollectionItem(props: CollectionItemProps) {
             disabled={isDeletePending()}
           >
             <div class="flex">
-              {isDeletePending() && <BsHourglassSplit class="swingy" />}
-              {deleteStatus() instanceof Error && (
+              <Show when={isDeletePending()}>
+                <BsHourglassSplit class="swingy" />
+              </Show>
+              <Show when={deleteStatus() instanceof Error}>
                 <div class="tooltip" data-tip={deleteStatus().toString()}>
                   <BsExclamationCircle size={18} />
                 </div>
-              )}
+              </Show>
               <BsTrash size={18} />
             </div>
           </button>

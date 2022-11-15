@@ -1,8 +1,7 @@
-import { Collection, CollectionEntry } from "../../api/types";
-import { createSignal } from "solid-js";
+import { AsyncStatus, Collection, CollectionEntry } from "../../api/types";
+import { createSignal, Show } from "solid-js";
 import { useApiContext } from "../../api/ApiContext";
-import { AsyncStatus } from "../errors/AsyncStatus";
-import { Alert } from "../errors/Alert";
+import { Alert } from "../Alert";
 import { BsHourglassSplit } from "solid-icons/bs";
 
 type NewEntryFormProps = {
@@ -79,15 +78,17 @@ export function NewEntryForm(props: NewEntryFormProps) {
           type="button"
           onClick={onSubmit}
           class="btn bg-bg"
-          disabled={!formValid() || isCreatePending ()}
+          disabled={!formValid() || isCreatePending()}
         >
-          {isCreatePending () && <BsHourglassSplit class="swingy" />}
+          <Show when={isCreatePending()}>
+            <BsHourglassSplit class="swingy" />
+          </Show>
           Add
         </button>
       </div>
-      {submitStatus() instanceof Error && (
+      <Show when={submitStatus() instanceof Error}>
         <Alert message={submitStatus().toString()} />
-      )}
+      </Show>
     </form>
   );
 }

@@ -1,10 +1,8 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { useApiContext } from "../api/ApiContext";
-import { Collection } from "../api/types";
+import { AsyncStatus, Collection } from "../api/types";
 import { useAuthData } from "../auth/AuthDataContext";
-import { Alert } from "./errors/Alert";
-import sharedStyles from "./../components/shared.module.css";
-import { AsyncStatus } from "./errors/AsyncStatus";
+import { Alert } from "./Alert";
 import { BsHourglassSplit } from "solid-icons/bs";
 
 type NewCollectionFormProps = {
@@ -45,7 +43,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
   const isCreatePending = () => submitStatus() === "pending";
 
   return (
-    <li class={"carousel-item block " + sharedStyles["collection-item"]}>
+    <li class="carousel-item block collection-item">
       <header class="flex justify-content-between w-full">
         <h1>Add new Collection</h1>
         <button
@@ -97,12 +95,14 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
           class="btn btn-sm bg-bg text-xl ml-auto mt-2"
           onClick={onSubmit}
         >
-          {isCreatePending() && <BsHourglassSplit class="swingy" />}
+          <Show when={isCreatePending()}>
+            <BsHourglassSplit class="swingy" />
+          </Show>
           Add
         </button>
-        {submitStatus() instanceof Error && (
+        <Show when={submitStatus() instanceof Error}>
           <Alert message={submitStatus().toString()} />
-        )}
+        </Show>
       </div>
     </li>
   );

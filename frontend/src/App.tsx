@@ -1,40 +1,14 @@
-import { createEffect, createSignal, For, onMount } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 
 import { useApiContext } from "./api/ApiContext";
 import { ResponseContent } from "./api/responseTypes";
 import { Collection, CollectionEntry } from "./api/types";
-import { CollectionItem } from "./components/CollectionItem/CollectionItem";
+import { CollectionsCarousel } from "./components/CollectionsCarousel";
 import { NewCollectionForm } from "./components/NewCollectionForm";
 import { OpenFormButton } from "./components/OpenFormButton/OpenFormButton";
+import { Skeleton } from "./Skeleton/Skeleton";
 
-// function Skeleton() {
-//   return (
-//     <main class="flex overflow-x-auto h-full">
-//       <OpenFormButton skeleton showingForm={false} switchStatus={() => {}} />
-//     </main>
-//   );
-// }
-
-// <>
-// {api() ? (
-//   <ApiContext.Provider value={api()!}>
-//     {props.children}
-//   </ApiContext.Provider>
-// ) : (
-//   <Skeleton />
-//   // <div class="flex justify-center items-center">
-//   //   <div
-//   //     class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
-//   //     role="status"
-//   //   >
-//   //     <span class="visually-hidden">Loading...</span>
-//   //   </div>
-//   // </div>
-// )}
-// </>
-// );
-
-export default function AuthenticatedPart() {
+export default function App() {
   const api = useApiContext()!;
 
   const [collections, setCollections] =
@@ -45,12 +19,6 @@ export default function AuthenticatedPart() {
   let list: HTMLLinkElement | undefined = undefined;
 
   const [error, setError] = createSignal<Error | null>();
-
-  const getCollectionEntries = (collection: Collection) => {
-    return (collectionEntries() || []).filter(
-      (cE) => cE.collectionId === collection.id
-    );
-  };
 
   createEffect(async () => {
     if (!api()) return;
@@ -76,63 +44,40 @@ export default function AuthenticatedPart() {
     await Promise.all([fetchCollections(), fetchCollectionEntries()]);
   });
 
-  const switchStatus = () => {
+  const switchFormStatus = () => {
     setShowForm(!showForm());
     setTimeout(() => list!.scrollTo(0, 0), 10);
   };
 
-  // todo isDeletePending
-  const isLoading = () => !error() && !collections() && !collectionEntries();
+  const dataLoaded = () => !!collections() && !!collectionEntries();
 
   return (
     <main class="flex overflow-x-auto h-full">
-      {error() ? (
-        <p>{error()?.message}</p>
-      ) : (
-        <>
+      <Show when={!error()} fallback={<p>{error()!.message}</p>}>
+        <Show when={dataLoaded()} fallback={<Skeleton />}>
           <OpenFormButton
             showingForm={showForm()}
-            switchStatus={switchStatus}
-            skeleton={isLoading()}
+            switchStatus={switchFormStatus}
           />
-          {collections() && collectionEntries() && (
-            <>
-              <ul class="carousel rounded-box" ref={list}>
-                {showForm() && (
-                  <NewCollectionForm
-                    hide={switchStatus}
-                    addCollection={(collection) => {
-                      setCollections([collection, ...collections()!]);
-                      switchStatus();
-                    }}
-                  />
-                )}
-                <For each={collections()}>
-                  {(collection) => (
-                    <CollectionItem
-                      collection={collection}
-                      entries={getCollectionEntries(collection)}
-                      onEntryAdd={(entry) =>
-                        setCollectionEntries([...collectionEntries()!, entry])
-                      }
-                      onEntryDelete={(id) => {
-                        setCollectionEntries(
-                          collectionEntries()!.filter((item) => item.id !== id)
-                        );
-                      }}
-                      onCollectionDelete={(id) => {
-                        setCollections(
-                          collections()!.filter((item) => item.id !== id)
-                        );
-                      }}
-                    />
-                  )}
-                </For>
-              </ul>
-            </>
-          )}
-        </>
-      )}
+          <ul class="carousel rounded-box" ref={list}>
+            <Show when={showForm()}>
+              <NewCollectionForm
+                hide={switchFormStatus}
+                addCollection={(collection) => {
+                  setCollections([collection, ...collections()!]);
+                  switchFormStatus();
+                }}
+              />
+            </Show>
+            <CollectionsCarousel
+              collections={collections()!}
+              collectionEntries={collectionEntries()!}
+              setCollections={setCollections}
+              setCollectionEntries={setCollectionEntries}
+            />
+          </ul>
+        </Show>
+      </Show>
     </main>
   );
 }

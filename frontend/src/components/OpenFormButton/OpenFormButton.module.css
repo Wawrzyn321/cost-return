@@ -20,5 +20,6 @@
 }
 
 .skeleton {
-  transform: translateX(-100px);
+  transform: translateX(-70px);
+  opacity: 0.8;
 }

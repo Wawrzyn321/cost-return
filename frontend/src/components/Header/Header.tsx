@@ -3,12 +3,31 @@ import styles from "./Header.module.css";
 import { useAuthData } from "../../auth/AuthDataContext";
 import { AnimatedCashback } from "../AnimatedCashback/AnimatedCashback";
 
+type GUser = {
+  given_name: string;
+  family_name: string;
+};
+
+type Auth0User = {
+  nickname: string;
+};
+
 export function Header() {
   const { user } = useAuth0()!;
   const { state: authDataState } = useAuthData()!;
   const { logout } = useAuth0()!;
 
-  const userInitials = () => user()?.given_name[0] + user()?.family_name[0];
+  const userInitials = () => {
+    const u = user();
+    if (!u) return null;
+    if (u.given_name) {
+      const { given_name, family_name } = u as GUser;
+      return given_name[0] + family_name[0];
+    } else {
+      const { nickname } = u as Auth0User;
+      return nickname.substring(0, 2).toUpperCase();
+    }
+  };
 
   return (
     <nav class="flex justify-between w-screen color-page">
