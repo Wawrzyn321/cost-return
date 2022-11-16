@@ -24,13 +24,13 @@ export function SkeletonItem() {
           </div>
           <ProgressBar value={0} max={1} />
         </header>
-        <div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box mt-4">
+        <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
           <input type="checkbox" />
           <div class="collapse-title text-l font-small"></div>
           <div class="collapse-content"></div>
         </div>
 
-        <div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box mt-4">
+        <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
           <input type="checkbox" />
           <div class="collapse-title text-l font-small"></div>
           <div class="collapse-content"></div>

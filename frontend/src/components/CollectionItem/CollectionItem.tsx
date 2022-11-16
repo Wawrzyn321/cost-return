@@ -58,7 +58,7 @@ export function CollectionItem(props: CollectionItemProps) {
             {amountPaid()}/{props.collection.startingAmount}
           </p>
           <button
-            class="btn btn-xs rounded-box h-8"
+            class="btn btn-xs rounded-box h-8 color-text--inverted"
             onClick={deleteCollection}
             disabled={isDeletePending()}
           >
@@ -80,7 +80,7 @@ export function CollectionItem(props: CollectionItemProps) {
           max={props.collection.startingAmount}
         />
       </header>
-      <div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box mt-4">
+      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
         <input type="checkbox" />
         <div class="collapse-title text-l font-small">
           Entries ({entriesCount()})
@@ -96,7 +96,7 @@ export function CollectionItem(props: CollectionItemProps) {
         </div>
       </div>
 
-      <div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box mt-4">
+      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
         <input type="checkbox" />
         <div class="collapse-title text-l font-small">Add new Entry</div>
         <div class="collapse-content">

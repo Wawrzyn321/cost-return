@@ -24,8 +24,6 @@ function FancyInteractiveCharacter(props: {
       if (Math.abs(diff) > 0) {
         setDeltaX(Math.sqrt(Math.abs(diff)) * Math.sign(diff));
       }
-    } else {
-      setDeltaX(0);
     }
   });
 
@@ -52,7 +50,7 @@ export function FancyInteractiveText(props: { text: string }) {
   const onMouseLeave = () => setMouseOver(false);
 
   return (
-    <div class="flex justify-center color-page whitespace-pre z-50">
+    <div class="flex justify-center color-text--inverted whitespace-pre z-50">
       <div
         class="px-8 py-1"
         onMouseEnter={onMouseEnter}

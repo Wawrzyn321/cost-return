@@ -1,6 +1,6 @@
 /* https://wweb.dev/resources/css-separator-generator/ */
 .container {
-  background: var(--bg-color);
+  background: var(--background-color);
   height: var(--underwater-height);
   width: 100vw;
   z-index: -1;
@@ -15,7 +15,7 @@
   top: var(--underwater-height);
   height: 70px;
   width: 100%;
-  background: var(--bg-color);
+  background: var(--background-color);
   bottom: 0;
   z-index: -1;
   animation: waving 6s ease-in-out infinite alternate;
@@ -45,7 +45,7 @@
 .wave::after {
   width: 55%;
   height: 100%;
-  background-color: var(--bg-color);
+  background-color: var(--background-color);
   left: -1.5%;
   top: 40%;
 }

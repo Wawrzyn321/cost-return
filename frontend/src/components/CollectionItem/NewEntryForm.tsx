@@ -77,7 +77,7 @@ export function NewEntryForm(props: NewEntryFormProps) {
         <button
           type="button"
           onClick={onSubmit}
-          class="btn bg-bg"
+          class="btn background-color--background color-text--inverted"
           disabled={!formValid() || isCreatePending()}
         >
           <Show when={isCreatePending()}>

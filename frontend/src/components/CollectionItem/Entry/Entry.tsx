@@ -37,7 +37,7 @@ export function Entry(props: {
         class={"grid place-content-center " + styles["delete-button-wrapper"]}
       >
         <button
-          class="btn bg-bg btn-xs"
+          class="btn background-color--background btn-xs"
           onClick={() => deleteEntry(props.entry.id)}
           disabled={isDeletePending()}
         >

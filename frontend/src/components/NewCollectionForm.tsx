@@ -47,7 +47,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
       <header class="flex justify-content-between w-full">
         <h1>Add new Collection</h1>
         <button
-          class="btn btn-circle btn-sm bg-bg text-xl ml-auto"
+          class="btn btn-circle btn-sm background-color--background text-xl ml-auto color-text--inverted"
           onClick={props.hide}
         >
           X
@@ -92,7 +92,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
         </form>
         <button
           disabled={!formValid() || isCreatePending()}
-          class="btn btn-sm bg-bg text-xl ml-auto mt-2"
+          class="btn btn-sm background-color--background color-text--inverted text-xl ml-auto mt-2"
           onClick={onSubmit}
         >
           <Show when={isCreatePending()}>

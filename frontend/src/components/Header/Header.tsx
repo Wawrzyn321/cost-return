@@ -30,7 +30,7 @@ export function Header() {
   };
 
   return (
-    <nav class="flex justify-between w-screen color-page">
+    <nav class="flex justify-between w-screen color-text--inverted">
       <div class={styles["header"]}>
         <AnimatedCashback />
         Cost-Return
@@ -40,12 +40,15 @@ export function Header() {
           authDataState()
         ) : (
           <div class="flex">
-            <button class="has-underline" onClick={logout}>
+            <button class="underline" onClick={logout}>
               Logout
             </button>
             <div class="avatar placeholder ml-2">
-              <div class="bg-secondary text-neutral-content rounded-full w-8">
-                <span class="text-xs">{userInitials()}</span>
+              <div
+                class={`text-neutral-content rounded-full w-8 ${styles["avatar-background-color"]}`}
+                id="avatar"
+              >
+                <span class="text-xs color-text--inverted">{userInitials()}</span>
               </div>
             </div>
           </div>
