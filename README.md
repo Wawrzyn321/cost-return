@@ -20,3 +20,9 @@ I want to keep track of each and every "payoff" of an single "investment", so I 
 
 # The details
  
+- [Frontend](./frontend/README.md)
+- [Backend](./backend/README.md)
+- Database models:
+    - `Collection` - a model of an "investment", contains the owner reference, initial amount and a name.
+    - `CollectionEntry` - a model for single payment, contains collection reference, cash amount and a comment.
+    - Users are kept as a default "User" Pocketbase collection.
