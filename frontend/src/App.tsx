@@ -1,20 +1,23 @@
-import { createEffect, createSignal, Show } from "solid-js";
+import { createEffect, createSignal, Show } from 'solid-js';
 
-import { useApiContext } from "./api/ApiContext";
-import { ResponseContent } from "./api/responseTypes";
-import { Collection, CollectionEntry } from "./api/types";
-import { CollectionsCarousel } from "./components/CollectionsCarousel";
-import { NewCollectionForm } from "./components/NewCollectionForm";
-import { OpenFormButton } from "./components/OpenFormButton/OpenFormButton";
-import { Skeleton } from "./Skeleton/Skeleton";
+import { useApiContext } from './api/ApiContext';
+import { ResponseContent } from './api/responseTypes';
+import { Collection, CollectionEntry } from './api/types';
+import { CollectionsCarousel } from './components/CollectionsCarousel';
+import { NewCollectionForm } from './components/NewCollectionForm';
+import { OpenFormButton } from './components/OpenFormButton/OpenFormButton';
+import { Skeleton } from './Skeleton/Skeleton';
 
 export default function App() {
   const api = useApiContext()!;
 
-  const [collections, setCollections] =
-    createSignal<ResponseContent<Collection> | null>(null);
-  const [collectionEntries, setCollectionEntries] =
-    createSignal<ResponseContent<CollectionEntry> | null>(null);
+  const [collections, setCollections] = createSignal<ResponseContent<
+    Collection
+  > | null>(null);
+  const [
+    collectionEntries,
+    setCollectionEntries,
+  ] = createSignal<ResponseContent<CollectionEntry> | null>(null);
   const [showForm, setShowForm] = createSignal(false);
   let list: HTMLLinkElement | undefined = undefined;
 
@@ -26,7 +29,7 @@ export default function App() {
     const fetchCollections = async () => {
       const response = await api()!.collections.getAll();
       if (response instanceof Error) {
-        setError((e) => e || response);
+        setError(e => e || response);
       } else {
         setCollections(response);
       }
@@ -35,7 +38,7 @@ export default function App() {
     const fetchCollectionEntries = async () => {
       const response = await api()!.collectionEntries.getAll();
       if (response instanceof Error) {
-        setError((e) => e || response);
+        setError(e => e || response);
       } else {
         setCollectionEntries(response);
       }
@@ -63,7 +66,7 @@ export default function App() {
             <Show when={showForm()}>
               <NewCollectionForm
                 hide={switchFormStatus}
-                addCollection={(collection) => {
+                addCollection={collection => {
                   setCollections([collection, ...collections()!]);
                   switchFormStatus();
                 }}

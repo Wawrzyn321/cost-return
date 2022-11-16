@@ -5,7 +5,7 @@ type LoginResponse = {
 };
 
 export async function login(auth0Token: string): Promise<LoginResponse> {
-  const url = import.meta.env.VITE_BACKEND_URL + "/login";
+  const url = import.meta.env.VITE_BACKEND_URL + '/login';
   const headers = { Authorization: `Bearer ${auth0Token}` };
 
   const response = await fetch(url, { headers });

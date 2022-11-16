@@ -1,4 +1,4 @@
-import styles from "./OpenFormButton.module.css";
+import styles from './OpenFormButton.module.css';
 
 type ActiveProps = {
   showingForm: boolean;
@@ -9,12 +9,14 @@ type ActiveProps = {
 export function OpenFormButton(props: ActiveProps) {
   const openButtonClass = () => {
     const showingFormClass = props.showingForm
-      ? styles["add-new--showing-form"]
-      : "";
+      ? styles['add-new--showing-form']
+      : '';
 
-    const skeletonClass = props.skeleton ? `pointer-events-none ${styles["skeleton"]}` : "";
+    const skeletonClass = props.skeleton
+      ? `pointer-events-none ${styles['skeleton']}`
+      : '';
 
-    return `${styles["add-new"]} ${showingFormClass} ${skeletonClass}`;
+    return `${styles['add-new']} ${showingFormClass} ${skeletonClass}`;
   };
 
   return (

@@ -1,12 +1,12 @@
-import { AsyncStatus, Collection, CollectionEntry } from "../../api/types";
-import { createSignal, For, Show } from "solid-js";
-import { NewEntryForm } from "./NewEntryForm";
-import { useApiContext } from "../../api/ApiContext";
-import { BsExclamationCircle, BsTrash } from "solid-icons/bs";
-import { Entry } from "./Entry/Entry";
-import { BsHourglassSplit } from "solid-icons/bs";
-import { PaidBadge } from "./PaidBadge/PaidBadge";
-import { ProgressBar } from "./Entry/PogressBar/ProgressBar";
+import { AsyncStatus, Collection, CollectionEntry } from '../../api/types';
+import { createSignal, For, Show } from 'solid-js';
+import { NewEntryForm } from './NewEntryForm';
+import { useApiContext } from '../../api/ApiContext';
+import { BsExclamationCircle, BsTrash } from 'solid-icons/bs';
+import { Entry } from './Entry/Entry';
+import { BsHourglassSplit } from 'solid-icons/bs';
+import { PaidBadge } from './PaidBadge/PaidBadge';
+import { ProgressBar } from './Entry/PogressBar/ProgressBar';
 
 type CollectionItemProps = {
   collection: Collection;
@@ -18,18 +18,18 @@ type CollectionItemProps = {
 
 export function CollectionItem(props: CollectionItemProps) {
   const api = useApiContext()!;
-  const [deleteStatus, setDeleteStatus] = createSignal<AsyncStatus>("none");
+  const [deleteStatus, setDeleteStatus] = createSignal<AsyncStatus>('none');
 
   const amountPaid = () =>
     Math.min(
       props.collection.startingAmount,
-      props.entries.reduce((acc, curr) => acc + curr.amount, 0)
+      props.entries.reduce((acc, curr) => acc + curr.amount, 0),
     );
 
   const entriesCount = () => props.entries.length;
 
   const deleteCollection = async () => {
-    setDeleteStatus("pending");
+    setDeleteStatus('pending');
     const { id } = props.collection;
     const response = await api()!.collections.deleteOne(id);
     if (response instanceof Error) {
@@ -39,7 +39,7 @@ export function CollectionItem(props: CollectionItemProps) {
     }
   };
 
-  const isDeletePending = () => deleteStatus() === "pending";
+  const isDeletePending = () => deleteStatus() === 'pending';
 
   return (
     <li class="carousel-item block border collection-item">
@@ -52,7 +52,7 @@ export function CollectionItem(props: CollectionItemProps) {
         </h1>
         <div
           class="grid bg-ng gap-4 place-items-center"
-          style={{ "grid-template-columns": "1fr 1fr" }}
+          style={{ 'grid-template-columns': '1fr 1fr' }}
         >
           <p class="text-2xl text-right">
             {amountPaid()}/{props.collection.startingAmount}
@@ -88,7 +88,7 @@ export function CollectionItem(props: CollectionItemProps) {
         <div class="collapse-content">
           <ul>
             <For each={props.entries}>
-              {(entry) => (
+              {entry => (
                 <Entry entry={entry} onEntryDelete={props.onEntryDelete} />
               )}
             </For>

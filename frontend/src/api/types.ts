@@ -17,4 +17,4 @@ export type CollectionEntry = {
   created: DateString;
 };
 
-export type AsyncStatus = "none" | "pending" | Error;
+export type AsyncStatus = 'none' | 'pending' | Error;

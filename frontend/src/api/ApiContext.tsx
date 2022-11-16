@@ -5,10 +5,10 @@ import {
   createSignal,
   JSX,
   useContext,
-} from "solid-js";
-import { useAuthData } from "../auth/AuthDataContext";
-import { createApi, ResourceApi } from "./createApi";
-import { Collection, CollectionEntry } from "./types";
+} from 'solid-js';
+import { useAuthData } from '../auth/AuthDataContext';
+import { createApi, ResourceApi } from './createApi';
+import { Collection, CollectionEntry } from './types';
 
 type Api = {
   collections: ResourceApi<Collection>;
@@ -25,10 +25,10 @@ export const ApiContextProvider = (props: { children: JSX.Element }) => {
     const data = authData();
     if (data) {
       setApi({
-        collections: createApi<Collection>("collections", data),
+        collections: createApi<Collection>('collections', data),
         collectionEntries: createApi<CollectionEntry>(
-          "collectionEntries",
-          data
+          'collectionEntries',
+          data,
         ),
       });
     }

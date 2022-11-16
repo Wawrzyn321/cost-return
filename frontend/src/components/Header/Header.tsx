@@ -1,7 +1,7 @@
-import { useAuth0 } from "@rturnq/solid-auth0";
-import styles from "./Header.module.css";
-import { useAuthData } from "../../auth/AuthDataContext";
-import { AnimatedCashback } from "../AnimatedCashback/AnimatedCashback";
+import { useAuth0 } from '@rturnq/solid-auth0';
+import styles from './Header.module.css';
+import { useAuthData } from '../../auth/AuthDataContext';
+import { AnimatedCashback } from '../AnimatedCashback/AnimatedCashback';
 
 type GUser = {
   given_name: string;
@@ -31,11 +31,11 @@ export function Header() {
 
   return (
     <nav class="flex justify-between w-screen color-text--inverted">
-      <div class={styles["header"]}>
+      <div class={styles['header']}>
         <AnimatedCashback />
         Cost-Return
       </div>
-      <p class={styles["state"]}>
+      <p class={styles['state']}>
         {authDataState() ? (
           authDataState()
         ) : (
@@ -45,10 +45,12 @@ export function Header() {
             </button>
             <div class="avatar placeholder ml-2">
               <div
-                class={`text-neutral-content rounded-full w-8 ${styles["avatar-background-color"]}`}
+                class={`text-neutral-content rounded-full w-8 ${styles['avatar-background-color']}`}
                 id="avatar"
               >
-                <span class="text-xs color-text--inverted">{userInitials()}</span>
+                <span class="text-xs color-text--inverted">
+                  {userInitials()}
+                </span>
               </div>
             </div>
           </div>

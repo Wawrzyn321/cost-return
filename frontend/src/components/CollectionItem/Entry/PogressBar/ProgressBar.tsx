@@ -1,9 +1,9 @@
-import styles from "./ProgressBar.module.css";
+import styles from './ProgressBar.module.css';
 
-export function ProgressBar(props: { value: number; max: number; }) {
+export function ProgressBar(props: { value: number; max: number }) {
   return (
     <progress
-      class={`progress w-100 ${styles["progress"]}`}
+      class={`progress w-100 ${styles['progress']}`}
       value={props.value}
       max={props.max}
     ></progress>

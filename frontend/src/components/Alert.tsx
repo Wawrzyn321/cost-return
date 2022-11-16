@@ -1,4 +1,4 @@
-import { BsExclamationOctagonFill } from "solid-icons/bs";
+import { BsExclamationOctagonFill } from 'solid-icons/bs';
 
 export function Alert(props: { message: string }) {
   return (

@@ -1,21 +1,24 @@
-import styles from "./SkeletonItem.module.css";
-import { ProgressBar } from "../../components/CollectionItem/Entry/PogressBar/ProgressBar";
-import { BsArrowClockwise } from "solid-icons/bs";
+import styles from './SkeletonItem.module.css';
+import { ProgressBar } from '../../components/CollectionItem/Entry/PogressBar/ProgressBar';
+import { BsArrowClockwise } from 'solid-icons/bs';
 
 export function SkeletonItem() {
   return (
     <>
       <li class="carousel-item block border collection-item pointer-events-none">
         <div
-          class={`absolute grid place-content-center ${styles["loading-wrapper"]}`}
+          class={`absolute grid place-content-center ${styles['loading-wrapper']}`}
         >
-          <BsArrowClockwise class={`opacity-50 ${styles['loading']}`} size={70}/>
+          <BsArrowClockwise
+            class={`opacity-50 ${styles['loading']}`}
+            size={70}
+          />
         </div>
         <header>
           <h1></h1>
           <div
             class="grid bg-ng gap-4 place-items-center"
-            style={{ "grid-template-columns": "1fr 1fr" }}
+            style={{ 'grid-template-columns': '1fr 1fr' }}
           >
             <p class="text-2xl text-right"></p>
             <button class="btn btn-xs rounded-box h-8 opacity-75">

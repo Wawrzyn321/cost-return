@@ -1,11 +1,11 @@
-import { Auth0 } from "@rturnq/solid-auth0";
-import { render } from "solid-js/web";
-import { ApiContextProvider } from "./api/ApiContext";
-import { Layout } from "./components/Layout/Layout";
-import { AuthDataProvider } from "./auth/AuthDataContext";
-import App from "./App";
+import { Auth0 } from '@rturnq/solid-auth0';
+import { render } from 'solid-js/web';
+import { ApiContextProvider } from './api/ApiContext';
+import { Layout } from './components/Layout/Layout';
+import { AuthDataProvider } from './auth/AuthDataContext';
+import App from './App';
 
-import "./index.css";
+import './index.css';
 
 render(
   () => (
@@ -25,5 +25,5 @@ render(
       </AuthDataProvider>
     </Auth0>
   ),
-  document.getElementById("root") as HTMLElement
+  document.getElementById('root') as HTMLElement,
 );

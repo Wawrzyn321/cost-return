@@ -1,5 +1,5 @@
-import { createEffect, createSignal, JSX, onMount } from "solid-js";
-import styles from "./FancyInteractiveText.module.css";
+import { createEffect, createSignal, JSX, onMount } from 'solid-js';
+import styles from './FancyInteractiveText.module.css';
 
 function FancyInteractiveCharacter(props: {
   char: string;
@@ -11,7 +11,7 @@ function FancyInteractiveCharacter(props: {
   const [initialPosX, setInitialPosX] = createSignal(0);
 
   const style = (): JSX.CSSProperties => {
-    return { transform: `translateX(${deltaX()}px)`, display: "inline-block" };
+    return { transform: `translateX(${deltaX()}px)`, display: 'inline-block' };
   };
 
   onMount(() => {
@@ -57,7 +57,7 @@ export function FancyInteractiveText(props: { text: string }) {
         onMouseLeave={onMouseLeave}
         onMouseMove={onMouseMove}
       >
-        {props.text.split("").map((char) => (
+        {props.text.split('').map(char => (
           <FancyInteractiveCharacter
             char={char}
             mouseX={mouseX()}

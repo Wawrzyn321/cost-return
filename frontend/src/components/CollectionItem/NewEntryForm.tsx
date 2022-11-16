@@ -1,8 +1,8 @@
-import { AsyncStatus, Collection, CollectionEntry } from "../../api/types";
-import { createSignal, Show } from "solid-js";
-import { useApiContext } from "../../api/ApiContext";
-import { Alert } from "../Alert";
-import { BsHourglassSplit } from "solid-icons/bs";
+import { AsyncStatus, Collection, CollectionEntry } from '../../api/types';
+import { createSignal, Show } from 'solid-js';
+import { useApiContext } from '../../api/ApiContext';
+import { Alert } from '../Alert';
+import { BsHourglassSplit } from 'solid-icons/bs';
 
 type NewEntryFormProps = {
   collection: Collection;
@@ -12,9 +12,9 @@ type NewEntryFormProps = {
 export function NewEntryForm(props: NewEntryFormProps) {
   let form: HTMLFormElement | undefined = undefined;
   const [formValid, setFormValid] = createSignal(false);
-  const [comment, setComment] = createSignal("");
+  const [comment, setComment] = createSignal('');
   const [amount, setAmount] = createSignal(0);
-  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>("none");
+  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>('none');
   const api = useApiContext()!;
 
   const onInput = () => {
@@ -22,7 +22,7 @@ export function NewEntryForm(props: NewEntryFormProps) {
   };
 
   const onSubmit = async () => {
-    setSubmitStatus("pending");
+    setSubmitStatus('pending');
     const body = {
       comment: comment(),
       amount: amount(),
@@ -34,13 +34,13 @@ export function NewEntryForm(props: NewEntryFormProps) {
       setSubmitStatus(response);
     } else {
       props.addEntry(response);
-      setComment("");
+      setComment('');
       setAmount(0);
-      setSubmitStatus("none");
+      setSubmitStatus('none');
     }
   };
 
-  const isCreatePending = () => submitStatus() === "pending";
+  const isCreatePending = () => submitStatus() === 'pending';
 
   return (
     <form ref={form} onInput={onInput}>
@@ -53,7 +53,7 @@ export function NewEntryForm(props: NewEntryFormProps) {
           type="text"
           placeholder="Comment"
           required
-          onChange={(e) => setComment((e.target as HTMLInputElement).value)}
+          onChange={e => setComment((e.target as HTMLInputElement).value)}
         />
         <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">
           Amount
@@ -66,7 +66,7 @@ export function NewEntryForm(props: NewEntryFormProps) {
             step={0.01}
             placeholder="Amount"
             required
-            onChange={(e) =>
+            onChange={e =>
               setAmount((e.target as HTMLInputElement).valueAsNumber)
             }
           />

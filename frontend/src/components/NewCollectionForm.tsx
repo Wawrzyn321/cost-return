@@ -1,9 +1,9 @@
-import { createSignal, Show } from "solid-js";
-import { useApiContext } from "../api/ApiContext";
-import { AsyncStatus, Collection } from "../api/types";
-import { useAuthData } from "../auth/AuthDataContext";
-import { Alert } from "./Alert";
-import { BsHourglassSplit } from "solid-icons/bs";
+import { createSignal, Show } from 'solid-js';
+import { useApiContext } from '../api/ApiContext';
+import { AsyncStatus, Collection } from '../api/types';
+import { useAuthData } from '../auth/AuthDataContext';
+import { Alert } from './Alert';
+import { BsHourglassSplit } from 'solid-icons/bs';
 
 type NewCollectionFormProps = {
   hide: () => void;
@@ -13,9 +13,9 @@ type NewCollectionFormProps = {
 export function NewCollectionForm(props: NewCollectionFormProps) {
   let form: HTMLFormElement | undefined = undefined;
   const [formValid, setFormValid] = createSignal(false);
-  const [name, setName] = createSignal("");
+  const [name, setName] = createSignal('');
   const [startingAmount, setStartingAmount] = createSignal(0);
-  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>("none");
+  const [submitStatus, setSubmitStatus] = createSignal<AsyncStatus>('none');
   const api = useApiContext()!;
   const { authData } = useAuthData()!;
 
@@ -24,7 +24,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
   };
 
   const onSubmit = async () => {
-    setSubmitStatus("pending");
+    setSubmitStatus('pending');
     const body = {
       name: name(),
       startingAmount: startingAmount(),
@@ -36,11 +36,11 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
       setSubmitStatus(response);
     } else {
       props.addCollection(response);
-      setSubmitStatus("none");
+      setSubmitStatus('none');
     }
   };
 
-  const isCreatePending = () => submitStatus() === "pending";
+  const isCreatePending = () => submitStatus() === 'pending';
 
   return (
     <li class="carousel-item block collection-item">
@@ -67,7 +67,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
               type="text"
               placeholder="Collection Name"
               required
-              onChange={(e) => setName((e.target as HTMLInputElement).value)}
+              onChange={e => setName((e.target as HTMLInputElement).value)}
             />
           </label>
           <label
@@ -84,7 +84,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
               step={0.01}
               placeholder="Starting Amount"
               required
-              onChange={(e) =>
+              onChange={e =>
                 setStartingAmount((e.target as HTMLInputElement).valueAsNumber)
               }
             />

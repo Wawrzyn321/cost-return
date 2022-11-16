@@ -28,7 +28,7 @@
 
 .wave::before,
 .wave::after {
-  content: "";
+  content: '';
   display: block;
   position: absolute;
   border-radius: 100% 50%;

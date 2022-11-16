@@ -1,4 +1,4 @@
-import { login } from "./login";
+import { login } from './login';
 
 import {
   Accessor,
@@ -7,8 +7,8 @@ import {
   createSignal,
   JSX,
   useContext,
-} from "solid-js";
-import { useAuth0 } from "@rturnq/solid-auth0";
+} from 'solid-js';
+import { useAuth0 } from '@rturnq/solid-auth0';
 
 export type AuthData = {
   auth0Token: string;
@@ -29,12 +29,16 @@ export const AuthDataProvider = (props: { children: JSX.Element }) => {
   const [contextState, setContextState] = createSignal<string | null>(null);
   const [fetchedData, setFetchedData] = createSignal(false);
 
-  const { getToken, isInitialized, isAuthenticated, loginWithRedirect } =
-    useAuth0()!;
+  const {
+    getToken,
+    isInitialized,
+    isAuthenticated,
+    loginWithRedirect,
+  } = useAuth0()!;
 
   createEffect(async () => {
     if (isInitialized() && !isAuthenticated()) {
-      setContextState("Logging in...");
+      setContextState('Logging in...');
       loginWithRedirect();
       return;
     }
@@ -43,9 +47,9 @@ export const AuthDataProvider = (props: { children: JSX.Element }) => {
     setFetchedData(true);
 
     try {
-      setContextState("Getting auth0 token...");
+      setContextState('Getting auth0 token...');
       const auth0Token = await getToken();
-      setContextState("Getting DB token...");
+      setContextState('Getting DB token...');
       const {
         token: pocketbaseToken,
         userId: pocketbaseUserId,
@@ -59,7 +63,7 @@ export const AuthDataProvider = (props: { children: JSX.Element }) => {
         pocketbaseProfileId: pocketbaseProfileId,
       });
       setContextState(null);
-    } catch (e: any) {
+    } catch (e) {
       if (e instanceof Error) {
         console.log(e);
         setContextState(`Error: ${e.message}.`);
