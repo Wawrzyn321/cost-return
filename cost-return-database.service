@@ -1,0 +1,11 @@
+[Unit]
+Description=Cost Return Database Service
+After=network.target
+
+[Service]
+ExecStart=/var/svc/cost-return-db/pocketbase serve
+Restart=on-failure
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
