@@ -4,11 +4,12 @@ from flask_cors import CORS
 from pocketbase import PocketBase
 import requests
 import os
-import jwt
 import uuid
 import time
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from before_request_hooks.preflight_hook import preflight_hook
+from before_request_hooks.app_auth_hook import app_auth_hook
 
 PORT = int(os.getenv('PORT') or '60055')
 ENV = (os.getenv('ENV') or 'DEV').upper()
@@ -36,45 +37,17 @@ def ensure_admin_login():
             last_admin_login_unix = int(time.time())
 
 
-def validate_token(token):
-    try:
-        alg = jwt.get_unverified_header(token)['alg']
-
-        domain = 'https://dev-cbdrgzv1.us.auth0.com'
-        jwks_url = domain + '/.well-known/jwks.json'
-        issuer = domain + '/'
-        audience = "cost-return-api"
-
-        jwks_client = jwt.PyJWKClient(jwks_url)
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
-
-        profile = jwt.decode(
-            token,
-            signing_key.key,
-            algorithms=[alg],
-            issuer=issuer,
-            audience=audience
-        )
-        return True, profile['sub'].replace('google-oauth2|', ''), None
-    except jwt.DecodeError as e:
-        print('jwt.DecodeError', e)
-        return False, None, 400
-    except jwt.InvalidTokenError as e:
-        print('jwt.InvalidTokenError', e)
-        return False, None, 403
-    except Exception as e:
-        print(e)
-        return False, None, 401
-
-
 app = flask.Flask(__name__)
 CORS(app, supports_credentials=True)
-
+# app.wsgi_app = OptionsMiddleware(app.wsgi_app)
 
 @app.before_request
 def handle_preflight():
-    if flask.request.method == "OPTIONS":
-        return flask.Response('', status=200)
+    return preflight_hook()
+
+@app.before_request
+def handle_app_auth():
+    return app_auth_hook()
 
 def handle_login(profile):
     ensure_admin_login()
@@ -144,28 +117,22 @@ def proxy_request(path):
         print(e)
         return 'Request error', 400
 
+@app.route('/login', methods=['POST'])
+def login_route():
+    try:
+        return handle_login(flask.g.profile)
+    except pocketbase.ClientResponseError as e:
+        return e.data or 'unknown error', e.status
+
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def index(path=''):
-    token = (flask.request.headers.get('Authorization') or '').replace('Bearer ', '')
-    token_valid, profile, error_status = validate_token(token)
-    if not token_valid:
-        return '', error_status
-
-    if path == 'login':
-        try:
-            return handle_login(profile)
-        except pocketbase.ClientResponseError as e:
-            return e.data or 'unknown error', e.status
-    else:
-        return proxy_request(path)
+    return proxy_request(path)
 
 
 print('Starting the', ENV, ' server on ', PORT)
 if ENV == 'PRODUCTION':
-    print('PROD')
     from waitress import serve
-
     serve(app, port=PORT, host='0.0.0.0', url_scheme='https')
 else:
     app.run(port=PORT, debug=True)
