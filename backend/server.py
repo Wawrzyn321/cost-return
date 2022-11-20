@@ -71,6 +71,11 @@ app = flask.Flask(__name__)
 CORS(app, supports_credentials=True)
 
 
+@app.before_request
+def handle_preflight():
+    if flask.request.method == "OPTIONS":
+        return flask.Response('', status=200)
+
 def handle_login(profile):
     ensure_admin_login()
 
@@ -142,9 +147,6 @@ def proxy_request(path):
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
 def index(path=''):
-    if flask.request.method == 'OPTIONS':
-        return '', 200
-
     token = (flask.request.headers.get('Authorization') or '').replace('Bearer ', '')
     token_valid, profile, error_status = validate_token(token)
     if not token_valid:
