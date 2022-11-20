@@ -29,6 +29,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
       name: name(),
       startingAmount: startingAmount(),
       user: authData()!.pocketbaseProfileId,
+      shared: false,
     };
 
     const response = await api()!.collections.createOne(body);
@@ -53,7 +54,7 @@ export function NewCollectionForm(props: NewCollectionFormProps) {
           X
         </button>
       </header>
-      <div class="flex flex-col space-between">
+      <div class="flex flex-col">
         <form class="mt-8" ref={form} onInput={onInput}>
           <label
             class="block text-gray-700 text-sm font-bold mb-2"

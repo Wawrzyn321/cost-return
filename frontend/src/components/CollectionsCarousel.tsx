@@ -23,6 +23,11 @@ export function CollectionsCarousel(props: {
           onEntryAdd={entry =>
             props.setCollectionEntries([...props.collectionEntries, entry])
           }
+          onCollectionUpdate={entry => {
+            const index = props.collections.findIndex(e => e.id === entry.id);
+            props.collections[index] = entry;
+            props.setCollections([...props.collections]);
+          }}
           onEntryDelete={id => {
             props.setCollectionEntries(
               props.collectionEntries.filter(item => item.id !== id),

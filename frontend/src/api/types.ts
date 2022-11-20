@@ -7,6 +7,7 @@ export type Collection = {
   startingAmount: number;
   created: DateString;
   entries: string[];
+  shared: boolean;
 };
 
 export type CollectionEntry = {

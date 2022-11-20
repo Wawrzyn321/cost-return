@@ -3,13 +3,13 @@ import { FancyInteractiveText } from '../FancyInteractiveText/FancyInteractiveTe
 import { JSX } from 'solid-js/jsx-runtime';
 import styles from './Layout.module.css';
 
-export function Layout(props: { children: JSX.Element }) {
+export function Layout(props: { children: JSX.Element; withAuth: boolean }) {
   const VSpacer = () => <div class={styles['v-spacer']}></div>;
 
   return (
     <>
       <div class={styles['container']}>
-        <Header />
+        <Header withAuth={props.withAuth} />
         <div class={styles['wave']}></div>
       </div>
       <VSpacer />

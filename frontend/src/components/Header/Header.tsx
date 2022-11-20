@@ -12,10 +12,9 @@ type Auth0User = {
   nickname: string;
 };
 
-export function Header() {
-  const { user } = useAuth0()!;
+function AuthBar() {
+  const { user, logout } = useAuth0()!;
   const { state: authDataState } = useAuthData()!;
-  const { logout } = useAuth0()!;
 
   const userInitials = () => {
     const u = user();
@@ -30,32 +29,36 @@ export function Header() {
   };
 
   return (
+    <p class={styles['state']}>
+      {authDataState() ? (
+        authDataState()
+      ) : (
+        <div class="flex">
+          <button class="underline" onClick={logout}>
+            Logout
+          </button>
+          <div class="avatar placeholder ml-2">
+            <div
+              class={`text-neutral-content rounded-full w-8 ${styles['avatar-background-color']}`}
+              id="avatar"
+            >
+              <span class="text-xs color-text--inverted">{userInitials()}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </p>
+  );
+}
+
+export function Header(props: { withAuth: boolean }) {
+  return (
     <nav class="flex justify-between w-screen color-text--inverted">
       <div class={styles['header']}>
         <AnimatedCashback />
         Cost-Return
       </div>
-      <p class={styles['state']}>
-        {authDataState() ? (
-          authDataState()
-        ) : (
-          <div class="flex">
-            <button class="underline" onClick={logout}>
-              Logout
-            </button>
-            <div class="avatar placeholder ml-2">
-              <div
-                class={`text-neutral-content rounded-full w-8 ${styles['avatar-background-color']}`}
-                id="avatar"
-              >
-                <span class="text-xs color-text--inverted">
-                  {userInitials()}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </p>
+      {props.withAuth && <AuthBar />}
     </nav>
   );
 }

@@ -4,14 +4,20 @@ import { NewEntryForm } from './NewEntryForm';
 import { useApiContext } from '../../api/ApiContext';
 import { BsExclamationCircle, BsTrash } from 'solid-icons/bs';
 import { Entry } from './Entry/Entry';
-import { BsHourglassSplit } from 'solid-icons/bs';
+import {
+  BsHourglassSplit,
+  BsClipboard2CheckFill,
+  BsClipboardXFill,
+} from 'solid-icons/bs';
 import { PaidBadge } from './PaidBadge/PaidBadge';
 import { ProgressBar } from './Entry/PogressBar/ProgressBar';
+import { SharingForm } from './SharingForm';
 
 type CollectionItemProps = {
   collection: Collection;
   onEntryAdd: (entry: CollectionEntry) => void;
   onEntryDelete: (entryId: string) => void;
+  onCollectionUpdate: (entry: Collection) => void;
   onCollectionDelete: (collectionId: string) => void;
   entries: CollectionEntry[];
 };
@@ -103,6 +109,29 @@ export function CollectionItem(props: CollectionItemProps) {
           <NewEntryForm
             collection={props.collection}
             addEntry={props.onEntryAdd}
+          />
+        </div>
+      </div>
+
+      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
+        <input type="checkbox" />
+        <div class="collapse-title text-l font-small">
+          <div class="flex">
+            Sharing{' '}
+            {props.collection.shared ? (
+              <BsClipboard2CheckFill
+                size={24}
+                class="ml-2 color-text--background"
+              />
+            ) : (
+              <BsClipboardXFill size={24} class="ml-2 color-text--background" />
+            )}
+          </div>
+        </div>
+        <div class="collapse-content">
+          <SharingForm
+            collection={props.collection}
+            updateCollection={props.onCollectionUpdate}
           />
         </div>
       </div>

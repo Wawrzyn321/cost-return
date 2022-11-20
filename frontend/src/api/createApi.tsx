@@ -1,6 +1,7 @@
 import {
-  CreateOneResponse,
   GetAllResponse,
+  CreateOneResponse,
+  UpdateOneResponse,
   DeleteOneResponse,
 } from './responseTypes';
 import { AuthData } from '../auth/AuthDataContext';
@@ -8,6 +9,7 @@ import { AuthData } from '../auth/AuthDataContext';
 export type ResourceApi<T> = {
   getAll: () => Promise<GetAllResponse<T>>;
   createOne: (body: any) => Promise<CreateOneResponse<T>>;
+  updateOne: (body: any) => Promise<UpdateOneResponse<T>>;
   deleteOne: (id: string) => Promise<DeleteOneResponse>;
 };
 
@@ -51,10 +53,10 @@ export function createApi<T>(
       return transformFn(await response.json());
     } catch (e) {
       if (e instanceof Error) {
-        return { error: e };
+        return e;
       } else {
         console.warn(e);
-        return { error: new Error('unknown error ' + e) };
+        return new Error('unknown error ' + e);
       }
     }
   };
@@ -70,6 +72,8 @@ export function createApi<T>(
         method: 'POST',
         body,
       }),
+    updateOne: async (body: any) =>
+      await doFetch({ url: '/' + body.id, method: 'PATCH', body }),
     deleteOne: async (id: string) =>
       await doFetch({ method: 'DELETE', url: '/' + id }),
   };

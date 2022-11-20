@@ -1,7 +1,6 @@
 import { createEffect, createSignal, Show } from 'solid-js';
 
 import { useApiContext } from './api/ApiContext';
-import { ResponseContent } from './api/responseTypes';
 import { Collection, CollectionEntry } from './api/types';
 import { CollectionsCarousel } from './components/CollectionsCarousel';
 import { NewCollectionForm } from './components/NewCollectionForm';
@@ -11,13 +10,10 @@ import { Skeleton } from './Skeleton/Skeleton';
 export default function App() {
   const api = useApiContext()!;
 
-  const [collections, setCollections] = createSignal<ResponseContent<
-    Collection
-  > | null>(null);
-  const [
-    collectionEntries,
-    setCollectionEntries,
-  ] = createSignal<ResponseContent<CollectionEntry> | null>(null);
+  const [collections, setCollections] = createSignal<Collection[] | null>(null);
+  const [collectionEntries, setCollectionEntries] = createSignal<
+    CollectionEntry[] | null
+  >(null);
   const [showForm, setShowForm] = createSignal(false);
   let list: HTMLLinkElement | undefined = undefined;
 
