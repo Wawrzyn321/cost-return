@@ -2,65 +2,49 @@ import flask
 import pocketbase.models
 from pocketbase import PocketBase
 import uuid
-import time
 import os
+from .pocketbase_admin_client import get_pocketbase_admin_client
 
-EMAIL = os.environ['EMAIL']
-PASSWORD = os.environ['PASSWORD']
-ADMIN_TOKEN_LIFETIME_S = int(os.getenv('ADMIN_TOKEN_LIFETIME_S') or 60 * 60 * 24)
 SERVER_SECRET = os.environ['SERVER_SECRET']
 REMOTE_ADDRESS = os.environ['REMOTE_ADDRESS']
 
-last_admin_login_unix = None
-
-pocketbase_admin_client = PocketBase(REMOTE_ADDRESS)
 pocketbase_user_client = PocketBase(REMOTE_ADDRESS)
 
-def ensure_admin_login():
-    global last_admin_login_unix
+def make_login_data(user_id):
+    generated_email = user_id + '@cost-return.oto-jest-wawrzyn.pl'
+    generated_password = uuid.uuid3(uuid.NAMESPACE_DNS, user_id + SERVER_SECRET)
+    return generated_email, str(generated_password)
 
-    if not last_admin_login_unix:
-        pocketbase_admin_client.admins.auth_via_email(EMAIL, PASSWORD)
-        last_admin_login_unix = int(time.time())
-    else:
-        if time.time() - last_admin_login_unix > ADMIN_TOKEN_LIFETIME_S * 0.9:
-            pocketbase_admin_client.admins.auth_via_email(EMAIL, PASSWORD)
-            last_admin_login_unix = int(time.time())
+def user_exists(client, email):
+    return email in [user.email for user in client.users.get_full_list()]
 
+def create_and_seed_user(client, email, password):
+    user = client.users.create({
+        'email': email,
+        'password': password,
+        'passwordConfirm': password
+    })
+
+    starter_collection = {
+        'name': 'An item I have to pay of',
+        'startingAmount': 59.99,
+        'user': user.profile.id
+    }
+    collection = client.records.create('collections', starter_collection)
+
+    starter_collection_entry = {
+        'comment': 'My first payment!',
+        'amount': 10,
+        'collectionId': collection.id
+    }
+    client.records.create('collectionEntries', starter_collection_entry)
 
 def login(profile):
-    ensure_admin_login()
-
-    def user_exists(possible_user_email):
-        return possible_user_email in [u.email for u in pocketbase_admin_client.users.get_full_list()]
-
-    def make_login_data(user_id):
-        generated_email = user_id + '@cost-return.oto-jest-wawrzyn.pl'
-        generated_password = uuid.uuid3(uuid.NAMESPACE_DNS, user_id + SERVER_SECRET)
-        return generated_email, str(generated_password)
-
     email, password = make_login_data(profile)
 
-    if not user_exists(email):
-        u = pocketbase_admin_client.users.create({
-            'email': email,
-            'password': password,
-            'passwordConfirm': password
-        })
-
-        starter_collection = {
-            'name': 'An item I have to pay of',
-            'startingAmount': 59.99,
-            'user': u.profile.id
-        }
-        collection = pocketbase_admin_client.records.create('collections', starter_collection)
-
-        starter_collection_entry = {
-            'comment': 'My first payment!',
-            'amount': 10,
-            'collectionId': collection.id
-        }
-        pocketbase_admin_client.records.create('collectionEntries', starter_collection_entry)
+    pocketbase_admin_client = get_pocketbase_admin_client()
+    if not user_exists(pocketbase_admin_client, email):
+        create_and_seed_user(pocketbase_admin_client, email, password)
 
     login_response = pocketbase_user_client.users.auth_via_email(email, password)
     data = {

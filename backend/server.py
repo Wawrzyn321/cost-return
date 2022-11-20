@@ -5,6 +5,7 @@ from before_request_hooks.preflight_hook import preflight_hook
 from before_request_hooks.app_auth_hook import app_auth_hook
 from request_handlers.handle_proxy_request import handle_proxy_request
 from request_handlers.handle_login import handle_login
+from request_handlers.handle_shared import handle_shared
 
 PORT = int(os.getenv('PORT') or '60055')
 ENV = (os.getenv('ENV') or 'DEV').upper()
@@ -18,15 +19,21 @@ def handle_preflight():
 
 @app.before_request
 def handle_app_auth():
-    return app_auth_hook()
+    # todo use decorator
+    if not flask.request.path.startswith('/shared'):
+        return app_auth_hook()
+
+@app.route('/shared/<collection_id>', methods=['GET'])
+def shared_route(collection_id):
+    return handle_shared(collection_id)
 
 @app.route('/login', methods=['POST'])
 def login_route():
     return handle_login()
 
-@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
-@app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
-def index(path=''):
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@app.route('/<path:path>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+def proxy_route(path=''):
     return handle_proxy_request(path)
 
 
