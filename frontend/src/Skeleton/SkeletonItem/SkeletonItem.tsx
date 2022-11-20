@@ -3,6 +3,14 @@ import { ProgressBar } from '../../components/CollectionItem/Entry/PogressBar/Pr
 import { BsArrowClockwise } from 'solid-icons/bs';
 
 export function SkeletonItem() {
+  const SkeletonPanel = () => (
+    <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
+      <input type="checkbox" />
+      <div class="collapse-title text-l font-small"></div>
+      <div class="collapse-content"></div>
+    </div>
+  );
+
   return (
     <>
       <li class="carousel-item block border collection-item pointer-events-none">
@@ -27,17 +35,10 @@ export function SkeletonItem() {
           </div>
           <ProgressBar value={0} max={1} />
         </header>
-        <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
-          <input type="checkbox" />
-          <div class="collapse-title text-l font-small"></div>
-          <div class="collapse-content"></div>
-        </div>
 
-        <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
-          <input type="checkbox" />
-          <div class="collapse-title text-l font-small"></div>
-          <div class="collapse-content"></div>
-        </div>
+        <SkeletonPanel />
+        <SkeletonPanel />
+        <SkeletonPanel />
       </li>
     </>
   );

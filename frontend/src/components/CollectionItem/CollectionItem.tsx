@@ -22,7 +22,11 @@ type CollectionItemProps = {
   entries: CollectionEntry[];
 };
 
-export function CollectionItem(props: CollectionItemProps) {
+const Header = (props: {
+  collection: Collection;
+  entries: CollectionEntry[];
+  onCollectionDelete: (collectionId: string) => void;
+}) => {
   const api = useApiContext()!;
   const [deleteStatus, setDeleteStatus] = createSignal<AsyncStatus>('none');
 
@@ -31,8 +35,6 @@ export function CollectionItem(props: CollectionItemProps) {
       props.collection.startingAmount,
       props.entries.reduce((acc, curr) => acc + curr.amount, 0),
     );
-
-  const entriesCount = () => props.entries.length;
 
   const deleteCollection = async () => {
     setDeleteStatus('pending');
@@ -48,93 +50,136 @@ export function CollectionItem(props: CollectionItemProps) {
   const isDeletePending = () => deleteStatus() === 'pending';
 
   return (
-    <li class="carousel-item block border collection-item">
-      <header>
-        <h1>
-          {props.collection.name}
-          <Show when={amountPaid() === props.collection.startingAmount}>
-            <PaidBadge />
-          </Show>
-        </h1>
-        <div
-          class="grid bg-ng gap-4 place-items-center"
-          style={{ 'grid-template-columns': '1fr 1fr' }}
+    <header>
+      <h1>
+        {props.collection.name}
+        <Show when={amountPaid() === props.collection.startingAmount}>
+          <PaidBadge />
+        </Show>
+      </h1>
+      <div
+        class="grid bg-ng gap-4 place-items-center"
+        style={{ 'grid-template-columns': '1fr 1fr' }}
+      >
+        <p class="text-2xl text-right">
+          {amountPaid()}/{props.collection.startingAmount}
+        </p>
+        <button
+          class="btn btn-xs rounded-box h-8 color-text--inverted"
+          onClick={deleteCollection}
+          disabled={isDeletePending()}
         >
-          <p class="text-2xl text-right">
-            {amountPaid()}/{props.collection.startingAmount}
-          </p>
-          <button
-            class="btn btn-xs rounded-box h-8 color-text--inverted"
-            onClick={deleteCollection}
-            disabled={isDeletePending()}
-          >
-            <div class="flex">
-              <Show when={isDeletePending()}>
-                <BsHourglassSplit class="swingy" />
-              </Show>
-              <Show when={deleteStatus() instanceof Error}>
-                <div class="tooltip" data-tip={deleteStatus().toString()}>
-                  <BsExclamationCircle size={18} />
-                </div>
-              </Show>
-              <BsTrash size={18} />
-            </div>
-          </button>
-        </div>
-        <ProgressBar
-          value={amountPaid()}
-          max={props.collection.startingAmount}
-        />
-      </header>
-      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
-        <input type="checkbox" />
-        <div class="collapse-title text-l font-small">
-          Entries ({entriesCount()})
-        </div>
-        <div class="collapse-content">
-          <ul>
-            <For each={props.entries}>
-              {entry => (
-                <Entry entry={entry} onEntryDelete={props.onEntryDelete} />
-              )}
-            </For>
-          </ul>
-        </div>
-      </div>
-
-      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
-        <input type="checkbox" />
-        <div class="collapse-title text-l font-small">Add new Entry</div>
-        <div class="collapse-content">
-          <NewEntryForm
-            collection={props.collection}
-            addEntry={props.onEntryAdd}
-          />
-        </div>
-      </div>
-
-      <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
-        <input type="checkbox" />
-        <div class="collapse-title text-l font-small">
           <div class="flex">
-            Sharing{' '}
-            {props.collection.shared ? (
-              <BsClipboard2CheckFill
-                size={24}
-                class="ml-2 color-text--background"
-              />
-            ) : (
-              <BsClipboardXFill size={24} class="ml-2 color-text--background" />
-            )}
+            <Show when={isDeletePending()}>
+              <BsHourglassSplit class="swingy" />
+            </Show>
+            <Show when={deleteStatus() instanceof Error}>
+              <div class="tooltip" data-tip={deleteStatus().toString()}>
+                <BsExclamationCircle size={18} />
+              </div>
+            </Show>
+            <BsTrash size={18} />
           </div>
-        </div>
-        <div class="collapse-content">
-          <SharingForm
-            collection={props.collection}
-            updateCollection={props.onCollectionUpdate}
-          />
+        </button>
+      </div>
+      <ProgressBar value={amountPaid()} max={props.collection.startingAmount} />
+    </header>
+  );
+};
+
+const EntriesPanel = (props: {
+  entries: CollectionEntry[];
+  onEntryDelete: (entryId: string) => void;
+}) => {
+  const entriesCount = () => props.entries.length;
+
+  return (
+    <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
+      <input type="checkbox" />
+      <div class="collapse-title text-l font-small">
+        Entries ({entriesCount()})
+      </div>
+      <div class="collapse-content">
+        <ul>
+          <For each={props.entries}>
+            {entry => (
+              <Entry entry={entry} onEntryDelete={props.onEntryDelete} />
+            )}
+          </For>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+const NewEntryPanel = (props: {
+  collection: Collection;
+  onEntryAdd: (entry: CollectionEntry) => void;
+}) => {
+  return (
+    <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
+      <input type="checkbox" />
+      <div class="collapse-title text-l font-small">Add new Entry</div>
+      <div class="collapse-content">
+        <NewEntryForm
+          collection={props.collection}
+          addEntry={props.onEntryAdd}
+        />
+      </div>
+    </div>
+  );
+};
+
+const SharingPanel = (props: {
+  collection: Collection;
+  onCollectionUpdate: (entry: Collection) => void;
+}) => {
+  return (
+    <div class="collapse collapse-arrow border border-base-300 background-page-color rounded-box mt-4">
+      <input type="checkbox" />
+      <div class="collapse-title text-l font-small">
+        <div class="flex">
+          Sharing{' '}
+          {props.collection.shared ? (
+            <BsClipboard2CheckFill
+              size={24}
+              class="ml-2 color-text--background"
+            />
+          ) : (
+            <BsClipboardXFill size={24} class="ml-2 color-text--background" />
+          )}
         </div>
       </div>
+      <div class="collapse-content">
+        <SharingForm
+          collection={props.collection}
+          updateCollection={props.onCollectionUpdate}
+        />
+      </div>
+    </div>
+  );
+};
+
+export function CollectionItem(props: CollectionItemProps) {
+  return (
+    <li class="carousel-item block border collection-item">
+      <Header
+        collection={props.collection}
+        entries={props.entries}
+        onCollectionDelete={props.onCollectionDelete}
+      />
+      <EntriesPanel
+        entries={props.entries}
+        onEntryDelete={props.onEntryDelete}
+      />
+      <NewEntryPanel
+        collection={props.collection}
+        onEntryAdd={props.onEntryAdd}
+      />
+      <SharingPanel
+        collection={props.collection}
+        onCollectionUpdate={props.onCollectionUpdate}
+      />
     </li>
   );
 }
