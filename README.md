@@ -10,7 +10,7 @@ I want to keep track of each and every "payoff" of an single "investment", so I 
 
 - Handle multiple users
 - Handle multiple "investments"
-- Sharing "investment" progress via magic links 
+- Sharing "investment" progress
 
 # The structure
 
