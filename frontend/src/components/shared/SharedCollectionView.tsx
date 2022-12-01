@@ -51,44 +51,6 @@ function PublicCollectionDisplaySkeleton() {
   );
 }
 
-export function SharedCollectionView(props: { collectionId: string }) {
-  const [collection, setCollection] = createSignal<PublicCollection | null>(
-    null,
-  );
-  const [error, setError] = createSignal<Error | null>(null);
-
-  onMount(async () => {
-    try {
-      const response = await getPublicCollection(props.collectionId);
-      if ('code' in response) {
-        throw Error(response.code.toString());
-      }
-      setCollection(response);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.warn(e);
-        setError(e);
-      } else {
-        throw e;
-      }
-    }
-  });
-
-  const isLoading = () => !error() && !collection();
-
-  return (
-    <div class="flex justify-center">
-      <Show when={isLoading()}>
-        <PublicCollectionDisplaySkeleton />
-      </Show>
-      <Show when={error()}>ERROR: {error()!.message}</Show>
-      <Show when={collection()}>
-        <PublicCollectionDisplay collection={collection()!} />
-      </Show>
-    </div>
-  );
-}
-
 function PublicCollectionDisplay(props: { collection: PublicCollection }) {
   const amountPaid = () =>
     Math.min(
@@ -134,6 +96,44 @@ function PublicCollectionDisplay(props: { collection: PublicCollection }) {
           </For>
         </ul>
       </div>
+    </div>
+  );
+}
+
+export function SharedCollectionView(props: { collectionId: string }) {
+  const [collection, setCollection] = createSignal<PublicCollection | null>(
+    null,
+  );
+  const [error, setError] = createSignal<Error | null>(null);
+
+  onMount(async () => {
+    try {
+      const response = await getPublicCollection(props.collectionId);
+      if ('code' in response) {
+        throw Error(response.code.toString());
+      }
+      setCollection(response);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.warn(e);
+        setError(e);
+      } else {
+        throw e;
+      }
+    }
+  });
+
+  const isLoading = () => !error() && !collection();
+
+  return (
+    <div class="flex justify-center">
+      <Show when={isLoading()}>
+        <PublicCollectionDisplaySkeleton />
+      </Show>
+      <Show when={error()}>ERROR: {error()!.message}</Show>
+      <Show when={collection()}>
+        <PublicCollectionDisplay collection={collection()!} />
+      </Show>
     </div>
   );
 }
