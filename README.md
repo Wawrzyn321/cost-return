@@ -15,7 +15,7 @@ I want to keep track of each and every "payoff" of an single "investment", so I 
 # The structure
 
 - Frontend: SolidJS with TailwindCSS & DaisyUI, w a c k y  a n i m a t i o n s
-- Backend: Flask - a one-file proxy, with one custom endpoint (for login)
+- Backend: Flask - a Pocketbase proxy, with two custom endpoints (for login & shared collections)
 - Database: Pocketbase
 
 # The details
