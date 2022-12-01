@@ -4,6 +4,7 @@ import { ApiContextProvider } from './api/ApiContext';
 import { Layout } from './components/Layout/Layout';
 import { AuthDataProvider } from './auth/AuthDataContext';
 import { Route, Router, Routes, useParams } from '@solidjs/router';
+import { SharedCollectionView } from './components/shared/SharedCollectionView';
 import App from './App';
 
 import './index.css';
@@ -29,7 +30,11 @@ const Main = () => (
 const Shared = () => {
   const params = useParams();
 
-  return <Layout withAuth={false}>{params.id}</Layout>;
+  return (
+    <Layout withAuth={false}>
+      <SharedCollectionView collectionId={params.id} />
+    </Layout>
+  );
 };
 
 render(

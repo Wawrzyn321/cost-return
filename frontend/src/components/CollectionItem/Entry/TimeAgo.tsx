@@ -7,7 +7,7 @@ export function TimeAgo(props: { timestamp: string | Date | number }) {
 
   const date = (): Date | number => {
     if (typeof props.timestamp === 'string') {
-      return Date.parse(props.timestamp + 'UTC');
+      return Date.parse(props.timestamp.replace('GMT', '') + 'UTC');
     } else {
       return props.timestamp;
     }

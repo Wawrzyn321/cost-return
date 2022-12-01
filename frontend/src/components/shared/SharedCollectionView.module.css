@@ -1,0 +1,12 @@
+.entries-grid {
+  display: grid;
+  grid-template-columns: 5fr 2fr 3fr;
+  border-top: 1px solid black;
+  height: 3rem;
+}
+
+.loading-wrapper {
+  height: calc(var(--content-height));
+  width: 30rem;
+  z-index: 1000;
+}

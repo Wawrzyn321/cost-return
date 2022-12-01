@@ -17,10 +17,7 @@ export function SkeletonItem() {
         <div
           class={`absolute grid place-content-center ${styles['loading-wrapper']}`}
         >
-          <BsArrowClockwise
-            class={`opacity-50 ${styles['loading']}`}
-            size={70}
-          />
+          <BsArrowClockwise class="opacity-50 loading-spinner" size={70} />
         </div>
         <header>
           <h1></h1>

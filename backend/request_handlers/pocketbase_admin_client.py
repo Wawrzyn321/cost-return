@@ -7,6 +7,7 @@ PASSWORD = os.environ['PASSWORD']
 ADMIN_TOKEN_LIFETIME_S = int(os.getenv('ADMIN_TOKEN_LIFETIME_S') or 60 * 60 * 24)
 SERVER_SECRET = os.environ['SERVER_SECRET']
 REMOTE_ADDRESS = os.environ['REMOTE_ADDRESS']
+
 pocketbase_admin_client = PocketBase(REMOTE_ADDRESS)
 
 last_admin_login_unix = None

@@ -6,8 +6,8 @@
     "dev": "VITE_BACKEND_URL='http://localhost:60055' vite",
     "build": "VITE_BACKEND_URL='https://cost-return-backend.oto-jest-wawrzyn.pl' vite build",
     "build-preview": "VITE_BACKEND_URL='https://cost-return-backend.oto-jest-wawrzyn.pl' vite preview",
-    "lint:fix": "prettier --config ./.prettierrc --write '**/*'",
-    "lint:check": "prettier --config ./.prettierrc --check '**/*'"
+    "lint:fix": "prettier --config ./.prettierrc  --ignore-path ./.prettierignore --write '**/*'",
+    "lint:check": "prettier --config ./.prettierrc  --ignore-path ./.prettierignore --check '**/*'"
   },
   "license": "MIT",
   "devDependencies": {
@@ -34,7 +34,7 @@
     "tslib": "^2.4.0"
   },
   "lint-staged": {
-    "*": "prettier --write"
+    "!(*.svg)*": "prettier --write"
   },
   "husky": {
     "hooks": {

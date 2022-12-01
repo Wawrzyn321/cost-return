@@ -7,7 +7,7 @@
 }
 
 .ball {
-  animation: rotate360 0.6s infinite alternate;
+  animation: ballAnim 0.6s infinite alternate;
   animation-timing-function: cubic-bezier(0.36, -0.03, 0.86, 0.66);
   animation-play-state: paused;
 }
@@ -15,7 +15,7 @@
   animation-play-state: running;
 }
 
-@keyframes rotate360 {
+@keyframes ballAnim {
   0% {
     transform: translateY(12px);
   }

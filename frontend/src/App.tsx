@@ -53,7 +53,7 @@ export default function App() {
   return (
     <main class="flex overflow-x-auto h-full">
       <Show when={!error()} fallback={<p>{error()!.message}</p>}>
-        <Show when={dataLoaded()} fallback={<Skeleton />}>
+        <Show when={dataLoaded() && false} fallback={<Skeleton />}>
           <OpenFormButton
             showingForm={showForm()}
             switchStatus={switchFormStatus}
