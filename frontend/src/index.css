@@ -55,12 +55,15 @@ body {
   0% {
     transform: rotate(-30deg);
   }
+
   20% {
     transform: rotate(30deg);
   }
+
   40% {
     transform: rotate(-30deg);
   }
+
   100% {
     transform: rotate(330deg);
   }
@@ -98,7 +101,12 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
+}
+
+.carousel {
+  scrollbar-width: unset;
 }
