@@ -27,7 +27,15 @@ def handle_proxy_request(path):
                                  url,
                                  data=flask.request.get_data(),
                                  headers=headers, verify=False)
-        return result.content, result.status_code
+
+        response = flask.make_response(result.content, result.status_code)
+
+
+
+        for key, value in result.headers.items():
+            if key != 'Transfer-Encoding':
+                response.headers[key] = value
+        return response 
     except Exception as e:
         print(e)
         return 'Request error', 400

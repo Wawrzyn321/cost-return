@@ -25,4 +25,5 @@ def handle_shared(collection_id):
             'entries': entries
         }
     except pocketbase.ClientResponseError as e:
+        print('shared error', e)
         return e.data or 'unknown error', e.status

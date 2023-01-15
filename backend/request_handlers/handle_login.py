@@ -59,4 +59,5 @@ def handle_login():
     try:
         return login(flask.g.profile)
     except pocketbase.ClientResponseError as e:
+        print('login error', e)
         return e.data or 'unknown error', e.status

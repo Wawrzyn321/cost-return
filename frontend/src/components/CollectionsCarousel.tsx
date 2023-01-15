@@ -9,6 +9,12 @@ export function CollectionsCarousel(props: {
   setCollectionEntries: (c: CollectionEntry[]) => void;
 }) {
   const getCollectionEntries = (collection: Collection) => {
+    const d = collection.name.includes('squasha');
+    if (d)
+      console.log(
+        collection.id,
+        props.collectionEntries.filter(cE => cE.collectionId === collection.id),
+      );
     return props.collectionEntries.filter(
       cE => cE.collectionId === collection.id,
     );

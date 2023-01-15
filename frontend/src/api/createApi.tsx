@@ -50,7 +50,15 @@ export function createApi<T>(
       if (!response.ok) {
         throw Error();
       }
-      return transformFn(await response.json());
+
+      const isJson = response.headers
+        .get('Content-Type')!
+        .includes('application/json');
+      if (isJson) {
+        return transformFn(await response.json());
+      } else {
+        return transformFn(await response.text());
+      }
     } catch (e) {
       if (e instanceof Error) {
         return e;
@@ -64,8 +72,13 @@ export function createApi<T>(
   return {
     getAll: async () =>
       await doFetch({
-        url: '?sort=-created',
-        transformFn: ({ items }) => items,
+        url: '?sort=-created&perPage=200',
+        transformFn: ({ items, totalPages }) => {
+          if (totalPages > 1) {
+            alert('not complete :(');
+          }
+          return items;
+        },
       }),
     createOne: async (body: any) =>
       await doFetch({
