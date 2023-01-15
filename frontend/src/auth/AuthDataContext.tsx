@@ -68,6 +68,9 @@ export const AuthDataProvider = (props: { children: JSX.Element }) => {
         console.error('Login error:', e);
         setContextState(`Error: ${e.message}.`);
       } else {
+        console.error(typeof e);
+        console.error(e);
+        alert((e as any)?.message);
         throw e;
       }
     }

@@ -6,10 +6,15 @@ export function TimeAgo(props: { timestamp: string | Date | number }) {
   const formatter = new jsTimeAgo('en-US');
 
   const date = (): Date | number => {
-    if (typeof props.timestamp === 'string') {
-      return Date.parse(props.timestamp.replace('GMT', '') + 'UTC');
-    } else {
-      return props.timestamp;
+    try {
+      if (typeof props.timestamp === 'string') {
+        return Date.parse(props.timestamp.replace('GMT', '') + 'Z');
+      } else {
+        return props.timestamp;
+      }
+    } catch (e) {
+      console.warn(e);
+      return 0;
     }
   };
 

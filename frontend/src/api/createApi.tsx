@@ -73,7 +73,8 @@ export function createApi<T>(
     getAll: async () =>
       await doFetch({
         url: '?sort=-created&perPage=200',
-        transformFn: ({ items, totalPages }) => {
+        transformFn: data => {
+          const { items, totalPages } = data;
           if (totalPages > 1) {
             alert('not complete :(');
           }
